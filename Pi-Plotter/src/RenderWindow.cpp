@@ -15,8 +15,6 @@
 
 #include "Log.h"
 #include "Arial.h"
-#include "Serial.h"
-#include "PortSetup.h"
 #include "RenderWindow.h"
 
 
@@ -178,92 +176,15 @@ void RenderWindow::ImGuiSetTheme() const noexcept
 }
 
 
-void RenderWindow::Show(bool connected, PortSetup* portSetup) noexcept
+void RenderWindow::Show() noexcept
 {
     ImGuiStartFrame();
-    const float width = Size().x;
+    const ImVec2 size = Size();
+    const ImVec2 plotSize{size.x / 3.f, size.y};
 
-    ImGui::SetNextWindowPos({ 0, 0 });
-    ImGui::SetNextWindowSize({ width, SettingsHeight });
-    ImGui::Begin("##Settings", nullptr, IMGUI_WINDOW_FLAGS);
-
-    RenderWindow::SetButtonRed(connected);
-    m_ConnectClicked = ImGui::Button(connected ? "Disconnect" : "Connect", BtnSize);
-    RenderWindow::ResetButtonColor();
-
-    ImGui::SameLine();
-    ImGui::SetNextItemWidth(BtnSize.x);
-    ImGui::Combo("##PortCombo", &portSetup->SelectedPort(), portSetup->PortsString());
-
-    ImGui::SameLine();
-    ImGui::SetNextItemWidth(BtnSize.x);
-    ImGui::Combo("baud", &portSetup->SelectedBaudRate(), Serial::Serial::BaudRates.data());
-
-    ImGui::SameLine();
-    if (ImGui::Button("Port Setup", BtnSize) || PortSetup::IsOpen())
-        portSetup->Show();
-
-    ImGui::SameLine();
-    if (ImGui::Button("Update ports", BtnSize))
-        portSetup->UpdatePorts();
-
-    ImGui::SameLine();
-    if (connected && ImGui::Button("Save all", BtnSize))
-        m_SaveAllClicked = true;
-
-    ImGui::SameLine();
-    ImGui::Checkbox("Debug info", &m_DebugInfoChecked);
-    if (ImGui::IsItemHovered())
-        ImGui::SetTooltip("Shows the number of y/x values every graph has.\nI left it in on purpose because it might be useful for some people.\nIt just isn't pleasant to look at.");
-    
-    ImGui::SameLine();
-    if(ImGui::Checkbox("VSync", &m_UsingVsync))
-    {
-        if(m_UsingVsync)
-            glfwSwapInterval(1);
-        else
-            glfwSwapInterval(0);
-    }
-    if(ImGui::IsItemHovered())
-        ImGui::SetTooltip("Enable/Disable vsync. Disabling might help if the plots don't update frequent enought\nIf the frame rate remains the same, check whether vsync is activated in the driver settings");
-
-    ImGui::SameLine(width - 250);
-    ImGui::Text("%.3f ms/frame (%.1f FPS)", 1000.f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
-    ImGui::End();
-}
-
-
-void RenderWindow::SetButtonRed(bool condition) noexcept
-{
-    if (condition)
-    {
-        ImVec4* colors = ImGui::GetStyle().Colors;
-        colors[ImGuiCol_Button] = ColorRed;
-        colors[ImGuiCol_ButtonHovered] = ColorLightRed;
-        colors[ImGuiCol_ButtonActive] = ColorLightRed;
-    }
-}
-
-void RenderWindow::ResetButtonColor() noexcept
-{
-    ImVec4* colors = ImGui::GetStyle().Colors;
-    colors[ImGuiCol_Button] = ImVec4(0.22f, 0.22f, 0.22f, 1.00f);
-    colors[ImGuiCol_ButtonHovered] = ImVec4(0.28f, 0.28f, 0.28f, 1.00f);
-    colors[ImGuiCol_ButtonActive] = ImVec4(0.000f, 0.439f, 0.878f, 0.824f);
-}
-
-void RenderWindow::SetThemePopup() noexcept
-{
-    ImGuiStyle* style = &ImGui::GetStyle();
-    style->WindowBorderSize = 1.0f;
-    style->WindowRounding = 6.0f;
-}
-
-void RenderWindow::SetThemeWindow() noexcept
-{
-    ImGuiStyle* style = &ImGui::GetStyle();
-    style->WindowBorderSize = 0.0f;
-    style->WindowRounding = 0.0f;
+    m_Archimedes.Render(plotSize, 0);
+    m_Chudnovsky.Render(plotSize, plotSize.x);
+    m_Newton.Render(plotSize, plotSize.x * 2.f);
 }
 
 
