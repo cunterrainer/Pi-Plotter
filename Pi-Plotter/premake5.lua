@@ -64,8 +64,6 @@ project "Pi-Plotter"
     filter { "toolset:gcc* or toolset:clang*" }
         enablewarnings {
             "cast-align",
-            "cast-qual",
-            "ctor-dtor-privacy",
             "disabled-optimization",
             "format=2",
             "init-self",
@@ -74,14 +72,10 @@ project "Pi-Plotter"
             "redundant-decls",
             "shadow",
             "sign-promo",
-            "switch-default",
-            "undef",
             "uninitialized",
             "unreachable-code",
             "unused",
             "alloca",
-            "conversion",
-            "deprecated",
             "format-security",
             "null-dereference",
             "stack-protector",
@@ -113,8 +107,7 @@ project "Pi-Plotter"
         externalwarnings "Everything"
         enablewarnings {
             "array-bounds",
-            "long-long",
-            "implicit-fallthrough", 
+            "long-long"
         }
         disablewarnings {"cast-align", "sign-conversion"}
         defines "CLANG"
