@@ -3,6 +3,7 @@
 .vscode/
 
 BIN/
+script/__pycache__/
 
 Makefile
 *.make

@@ -38,6 +38,18 @@ public:
 	inline void AddArchimedes(uint32_t x, uint32_t y) { m_Archimedes.Add(x, y); }
 	inline void AddChudnovsky(uint32_t x, uint32_t y) { m_Chudnovsky.Add(x, y); }
 	inline void AddNewton(uint32_t x, uint32_t y)     { m_Newton.Add(x, y);     }
+	inline void Add(uint32_t x, uint32_t y, uint8_t identifier)
+	{
+		switch (identifier)
+		{
+		case 0:
+			m_Archimedes.Add(x, y); break;
+		case 1:
+			m_Chudnovsky.Add(x, y); break;
+		default:
+			m_Newton.Add(x, y); break;
+		}
+	}
 };
 
 int MsgBoxError(const char* message);

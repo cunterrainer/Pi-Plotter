@@ -1,5 +1,8 @@
 #pragma once
 #include "boost/multiprecision/cpp_bin_float.hpp"
+#include "boost/math/constants/constants.hpp"
+
+#include "Trigonometry.h"
 
 namespace Pi
 {
@@ -8,19 +11,9 @@ namespace Pi
 
 namespace Pi
 {
-    namespace bmp = boost::multiprecision;
     namespace bm  = boost::math;
-    using Float = bmp::number<bmp::cpp_bin_float<2000>>;
-
-    Float Factorial(unsigned int n)
-    {
-        if (n <= 1)
-            return 1;
-        Float result = 1;
-        for (unsigned int i = 2; i < n + 1; ++i)
-            result *= i;
-        return result;
-    }
+    namespace bmp = boost::multiprecision;
+    using Float = bmp::number<bmp::cpp_bin_float<10000>>;
 
     Float Chudnovsky(uint32_t i)
     {
@@ -31,8 +24,8 @@ namespace Pi
         static Float b(13591409);
 
         --i;
-        const Float num = Factorial(6 * i) * (a * i + b);
-        const Float denom = Factorial(3 * i) * bmp::pow(Factorial(i), 3) * longNumPow;
+        const Float num = Math::Factorial<Float>(6 * i) * (a * i + b);
+        const Float denom = Math::Factorial<Float>(3 * i) * bmp::pow(Math::Factorial<Float>(i), 3) * longNumPow;
         prevNumDenom += num / denom;
         longNumPow *= Float(-262537412640768000);
         return sumNum / prevNumDenom;
@@ -41,14 +34,14 @@ namespace Pi
     Float Newton(uint32_t)
     {
         static Float prevSum = 3;
-        prevSum = prevSum - bmp::tan(prevSum);
+        prevSum = prevSum - Math::Tan<200>(prevSum);
         return prevSum;
     }
 
     Float Archimedes(uint32_t i)
     {
         static Float rad(180 * (bm::constants::pi<double>() / 180.0));
-        return i * bmp::sin(rad / i);
+        return i * Math::Sin(rad / i);
     }
 
     uint32_t Matches(const Float& decNum, uint32_t)

@@ -48,15 +48,15 @@ def Measure(iterations, func):
     Chudnovsky.prevNumDenom = 0
     Chudnovsky.longNumPow = 1 #-262537412640768000^0 = 1
     Chudnovsky.sumNum = Decimal(426880)*Decimal(10005).sqrt()
-    bar = IncrementalBar("Iteration", max=iterations, suffix="%(index)d/%(max)d %(percent).2f%%")
+    #bar = IncrementalBar("Iteration", max=iterations, suffix="%(index)d/%(max)d %(percent).2f%%")
 
     for i in range(1, iterations+1):
-        bar.next()
+        #bar.next()
         same = Matches(func(i), start)
         start += same
         xpoints = np.append(xpoints, i)
         ypoints = np.append(ypoints, start)
-    bar.finish()
+    #bar.finish()
     return xpoints, ypoints
 
 def Smooth(xpoints, ypoints):

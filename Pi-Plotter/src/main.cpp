@@ -1,29 +1,43 @@
+#include <thread>
+#include <atomic>
+#include <limits>
 #include <cstdint>
+#include <iostream>
 
 #include "Pi.h"
 #include "Clang.h"
 #include "RenderWindow.h"
 
+
+inline std::atomic_bool StopThreads = false;
+template <typename Func>
+inline void Calculate(RenderWindow* window, Func func, uint8_t identifier)
+{
+    uint32_t i = 1;
+    while (i < std::numeric_limits<Pi::Float>::digits10 && !StopThreads)
+    {
+        window->Add(i, Pi::Measure(i, func), identifier);
+        ++i;
+    }
+}
+
+
 int main()
 {
     RenderWindow window;
-    uint32_t a = 1;
-    uint32_t c = 1;
-    uint32_t n = 1;
+    std::thread archimedes(Calculate<decltype(Pi::Archimedes)>, &window, Pi::Archimedes, 0);
+    std::thread chudnovsky(Calculate<decltype(Pi::Chudnovsky)>, &window, Pi::Chudnovsky, 1);
+    std::thread newton(Calculate<decltype(Pi::Newton)>, &window, Pi::Newton, 2);
 
     while (window.IsOpen())
     {
         window.Show();
-        if (a < 100)
-        {
-            window.AddArchimedes(a, Pi::Measure(a, Pi::Archimedes));
-            window.AddChudnovsky(c, Pi::Measure(c, Pi::Chudnovsky));
-            window.AddNewton(n, Pi::Measure(n, Pi::Newton)); // little bit too accurate
-        }
         window.EndFrame();
-        ++a;
-        ++c;
-        ++n;
     }
+
+    StopThreads = true;
+    archimedes.join();
+    chudnovsky.join();
+    newton.join();
     return 0;
 }

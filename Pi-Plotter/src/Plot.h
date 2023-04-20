@@ -1,6 +1,6 @@
 #pragma once
 #include <limits>
-#include <cmath>
+#include <mutex>
 #include <string>
 #include <cstdlib>
 #include <type_traits>
@@ -20,6 +20,7 @@ private:
 private:
     std::vector<T> m_Xs;
     std::vector<T> m_Ys;
+    std::mutex m_Mutex;
     const char* m_Name = nullptr;
     double m_YMax      = std::numeric_limits<double>::lowest();
     double m_YMin      = std::numeric_limits<double>::max();
@@ -28,7 +29,8 @@ private:
 private:
     inline void CalculateYRange()
     {
-        const double yOffset = -std::max(std::abs(m_GreatestY * YPercentageScalar), std::abs(m_LowestY * YPercentageScalar));
+        double yOffset = -std::max(std::abs(m_GreatestY * YPercentageScalar), std::abs(m_LowestY * YPercentageScalar));
+        if (yOffset == 0.0) yOffset = -1.0;
         m_YMax = m_GreatestY - yOffset;
         m_YMin = m_LowestY + yOffset;
     }
@@ -37,6 +39,7 @@ public:
 
     inline void Add(T x, T y)
     {
+        std::lock_guard lock(m_Mutex);
         m_Xs.push_back(x);
         m_Ys.push_back(y);
         m_GreatestY = std::max(m_GreatestY, static_cast<double>(y));
@@ -52,9 +55,10 @@ public:
         ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
         ImGui::Begin(m_Name, nullptr, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoTitleBar);
 
-        if (ImPlot::BeginPlot(m_Name, {-1, -1}))
+        if (ImPlot::BeginPlot(m_Name, {-1, -1}, ImPlotFlags_NoLegend))
         {
             ImPlot::SetupAxes(XLabel, YLabel, ImPlotAxisFlags_AutoFit | ImPlotAxisFlags_NoHighlight, ImPlotAxisFlags_NoHighlight);
+            std::lock_guard lock(m_Mutex);
             ImPlot::SetupAxisLimits(ImAxis_Y1, m_YMin, m_YMax, ImPlotCond_Always);
             ImPlot::PlotLine("Pi", m_Xs.data(), m_Ys.data(), m_Xs.size());
             ImPlot::EndPlot();
