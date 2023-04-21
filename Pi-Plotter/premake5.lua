@@ -13,6 +13,8 @@ project "Pi-Plotter"
     includedirs {
         "src",
         "vendor",
+        "../Dependencies/gmp",
+        "../Dependencies/mpfr/src",
         "../Dependencies/math/include",
         "../Dependencies/GLFW/include",
         "../Dependencies/ImGui/include",
@@ -23,6 +25,8 @@ project "Pi-Plotter"
 
     externalincludedirs {
         "vendor",
+        "../Dependencies/gmp",
+        "../Dependencies/mpfr/src",
         "../Dependencies/ImGui/include"
     }
 
@@ -32,7 +36,9 @@ project "Pi-Plotter"
         "glfw",
         "nativefiledialog",
         "ImGui",
-        "ImPlot"
+        "ImPlot",
+        "gmp",
+        "mpfr"
     }
 
     filter "system:windows"
@@ -56,10 +62,16 @@ project "Pi-Plotter"
     --gcc* clang* msc*
     filter "toolset:msc*"
         warnings "High"
-        externalwarnings "Default"
+        externalwarnings "Off"
         disablewarnings {}
         buildoptions { "/sdl" }
         defines "MSC"
+
+    filter { "toolset:msc* or toolset:clang*" }
+        libdirs {
+            "../Dependencies/gmp/libs/clang",
+            "../Dependencies/mpfr/libs/clang"
+        }
 
     filter { "toolset:gcc* or toolset:clang*" }
         enablewarnings {
@@ -101,6 +113,10 @@ project "Pi-Plotter"
         }
         disablewarnings "cast-function-type"
         defines "GCC"
+        libdirs {
+            "../Dependencies/gmp/libs/gcc",
+            "../Dependencies/mpfr/libs/gcc"
+        }
 
     filter "toolset:clang*"
         warnings "Extra"

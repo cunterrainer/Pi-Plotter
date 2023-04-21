@@ -34,14 +34,15 @@ namespace Pi
     Float Newton(uint32_t)
     {
         static Float prevSum = 3;
-        prevSum = prevSum - Math::Tan<200>(prevSum);
+        //prevSum = prevSum - Math::Sin<200>(prevSum)/Math::Cos<2>(prevSum);
         return prevSum;
     }
 
-    Float Archimedes(uint32_t i)
+    Float Archimedes(uint32_t)
     {
         static Float rad(180 * (bm::constants::pi<double>() / 180.0));
-        return i * Math::Sin(rad / i);
+        return 0;
+        //return i * Math::Sin(rad / i);
     }
 
     uint32_t Matches(const Float& decNum, uint32_t)

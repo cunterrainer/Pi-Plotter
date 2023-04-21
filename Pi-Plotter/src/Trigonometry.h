@@ -1,6 +1,4 @@
 #pragma once
-#include "boost/multiprecision/cpp_bin_float.hpp"
-
 namespace Math
 {
     template <typename T>

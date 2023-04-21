@@ -60,7 +60,7 @@ public:
             ImPlot::SetupAxes(XLabel, YLabel, ImPlotAxisFlags_AutoFit | ImPlotAxisFlags_NoHighlight, ImPlotAxisFlags_NoHighlight);
             std::lock_guard lock(m_Mutex);
             ImPlot::SetupAxisLimits(ImAxis_Y1, m_YMin, m_YMax, ImPlotCond_Always);
-            ImPlot::PlotLine("Pi", m_Xs.data(), m_Ys.data(), m_Xs.size());
+            ImPlot::PlotLine("Pi", m_Xs.data(), m_Ys.data(), (int)m_Xs.size());
             ImPlot::EndPlot();
         }
         ImGui::End();
