@@ -16,7 +16,7 @@ namespace Pi
     namespace bm  = boost::math;
     namespace bmp = boost::multiprecision;
     //using Float = bmp::number<bmp::cpp_bin_float<10000>>;
-    using Float = FloatArbitrary<15000>;
+    using Float = FloatArbitrary<1500000>;
 
     mpz_t* Init()
     {
@@ -60,13 +60,14 @@ namespace Pi
         //return sumNum / prevNumDenom;
     }
 
-    //Float Newton(uint32_t)
-    //{
-    //    static Float prevSum = 3;
-    //    //prevSum = prevSum - Math::Sin<200>(prevSum)/Math::Cos<2>(prevSum);
-    //    return prevSum;
-    //}
-    //
+    Float Newton(uint32_t)
+    {
+        static Float prevSum = 3;
+        Float tan = prevSum;
+        prevSum - tan.Tan();
+        return prevSum;
+    }
+    
     Float Archimedes(uint32_t i)
     {
         static Float rad(180 * (bm::constants::pi<double>() / 180.0));

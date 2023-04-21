@@ -26,8 +26,8 @@ int main()
 {
     RenderWindow window;
     std::thread archimedes(Calculate<decltype(Pi::Archimedes)>, &window, Pi::Archimedes, 0);
-    //std::thread chudnovsky(Calculate<decltype(Pi::Chudnovsky)>, &window, Pi::Chudnovsky, 1);
-    //std::thread newton(Calculate<decltype(Pi::Newton)>, &window, Pi::Newton, 2);
+    std::thread chudnovsky(Calculate<decltype(Pi::Chudnovsky)>, &window, Pi::Chudnovsky, 1);
+    std::thread newton(Calculate<decltype(Pi::Newton)>, &window, Pi::Newton, 2);
 
     while (window.IsOpen())
     {
@@ -37,8 +37,8 @@ int main()
 
     StopThreads = true;
     archimedes.join();
-    //chudnovsky.join();
-    //newton.join();
+    chudnovsky.join();
+    newton.join();
     mpfr_free_cache();
     return 0;
 }
