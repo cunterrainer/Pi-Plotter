@@ -22,6 +22,7 @@ def Chudnovsky(i):
     denom = factorial(3*i)*pow(factorial(i), 3)*Chudnovsky.longNumPow
     Chudnovsky.prevNumDenom += num/denom
     Chudnovsky.longNumPow *= Decimal(-262537412640768000)
+    print(Chudnovsky.prevNumDenom)
     return Chudnovsky.sumNum/Chudnovsky.prevNumDenom
 
 def Newton_Raphson(i):
