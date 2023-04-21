@@ -67,18 +67,17 @@ namespace Pi
     //    return prevSum;
     //}
     //
-    //Float Archimedes(uint32_t)
-    //{
-    //    static Float rad(180 * (bm::constants::pi<double>() / 180.0));
-    //    return 0;
-    //    //return i * Math::Sin(rad / i);
-    //}
+    Float Archimedes(uint32_t i)
+    {
+        static Float rad(180 * (bm::constants::pi<double>() / 180.0));
+        Float a = rad;
+        return (a / i).Sin() * i;
+    }
 
     uint32_t Matches(const Float& decNum, uint32_t)
     {
         uint32_t same = 0;
         std::string decStr = decNum.Str().erase(0, 1);
-        //std::cout << "c: " << decStr << std::endl;
         for (size_t i = 0; i < decStr.size(); ++i)
         {
             if (decStr[i] != PiMillionStr[i])

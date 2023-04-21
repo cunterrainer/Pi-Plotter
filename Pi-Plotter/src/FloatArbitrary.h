@@ -80,6 +80,12 @@ public:
         return *this;
     }
 
+    inline FloatArbitrary& Sin()
+    {
+        mpfr_sin(m_Val, m_Val, ROUNDING_MODE);
+        return *this;
+    }
+
     inline FloatArbitrary& operator*(unsigned long int op)
     {
         mpfr_mul_ui(m_Val, m_Val, op, ROUNDING_MODE);
@@ -95,6 +101,12 @@ public:
     inline FloatArbitrary& operator*(const FloatArbitrary& other)
     {
         mpfr_mul(m_Val, m_Val, other.m_Val, ROUNDING_MODE);
+        return *this;
+    }
+
+    inline FloatArbitrary operator/(unsigned long int op)
+    {
+        mpfr_div_ui(m_Val, m_Val, op, ROUNDING_MODE);
         return *this;
     }
 
