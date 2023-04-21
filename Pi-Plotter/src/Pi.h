@@ -1,10 +1,12 @@
 #pragma once
 #include <cmath>
+#include <array>
 #include "boost/multiprecision/cpp_bin_float.hpp"
 #include "boost/math/constants/constants.hpp"
 #include "mpfr.h"
 
 #include "FloatArbitrary.h"
+#include "FactorialTable.h"
 
 namespace Pi
 {
@@ -16,21 +18,21 @@ namespace Pi
     namespace bm  = boost::math;
     namespace bmp = boost::multiprecision;
     //using Float = bmp::number<bmp::cpp_bin_float<10000>>;
-    using Float = FloatArbitrary<1500000>;
+    using Float = FloatArbitrary<150000>;
 
-    mpz_t* Init()
+    mpz_t& Init()
     {
         static mpz_t longNum;
         mpz_init2(longNum, 20);
         mpz_set_str(longNum, "-262537412640768000", 10);
-        return &longNum;
+        return longNum;
     }
 
     Float Chudnovsky(uint32_t i)
     {
         static Float prevNumDenom = 0;
         static Float longNumPow = 1; // -262537412640768000^0 = 1
-        static mpz_t* longNum = Init();
+        static const mpz_t& longNum = Init();
         Float sumNum = Float(426880) * Float(10005).Sqrt();
         static Float a(545140134);
         static const unsigned long int b = 13591409;
@@ -43,17 +45,19 @@ namespace Pi
         --i;
         //const Float num = Math::Factorial<Float>(6 * i) * (a * i + b);
         //Float num = c * a; // c*(a*i+b);
-        Float num = c.Factorial(6 * i) * (a * i + b);
+        
+        Float num = (a * i + b) * FactTable[6*i];
+        //Float num = (a * i + b) * (unsigned long)table[6*i];
         //const Float denom = Math::Factorial<Float>(3 * i) * bmp::pow(Math::Factorial<Float>(i), 3) * longNumPow;
-        Float denom = c.Factorial(3 * i);
-        a.Factorial(i);
+        Float denom = FactTable[3 * i];//c.Factorial(3 * i);
+        a = FactTable[i];
         a.Pow(3);
         denom *= a;
         denom *= longNumPow;
         prevNumDenom += num.operator/(denom);
         //longNumPow.Assign("-262537412640768000");
         //longNumPow.Pow(i + 1);
-        longNumPow *= *longNum;
+        longNumPow *= longNum;
         return sumNum / prevNumDenom;
         //prevNumDenom += num / denom;
         //longNumPow *= Float(-262537412640768000);

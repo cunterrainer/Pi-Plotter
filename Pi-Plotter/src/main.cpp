@@ -7,6 +7,7 @@
 
 #include "Pi.h"
 #include "Clang.h"
+#include "Profiler.h"
 #include "RenderWindow.h"
 
 inline std::atomic_bool StopThreads = false;
@@ -14,11 +15,14 @@ template <typename Func>
 inline void Calculate(RenderWindow* window, Func func, uint8_t identifier)
 {
     uint32_t i = 1;
+    Profiler::Start();
     while (i <= 1000 && !StopThreads)
     {
         window->Add(i, Pi::Measure(i, func), identifier);
         ++i;
     }
+    Profiler::End();
+    std::cout << Profiler::Average(Profiler::Conversion::Seconds) << " sec(s)" << std::endl; // 6.5
 }
 
 

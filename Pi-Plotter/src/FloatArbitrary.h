@@ -1,5 +1,5 @@
 #pragma once
-#include <cstdio>
+#include <string>
 
 #include "mpfr.h"
 
@@ -51,6 +51,18 @@ public:
         mpfr_set_str(m_Val, value, 10, ROUNDING_MODE);
     }
 
+    inline FloatArbitrary(const mpz_t& value)
+    {
+        mpfr_init2(m_Val, Precision);
+        mpfr_set_z(m_Val, value, ROUNDING_MODE);
+    }
+
+    inline FloatArbitrary& operator=(const mpz_t& x)
+    {
+        mpfr_set_z(m_Val, x, ROUNDING_MODE);
+        return *this;
+    }
+
     inline FloatArbitrary& operator=(unsigned long x)
     {
         mpfr_set_ui(m_Val, x, ROUNDING_MODE);
@@ -95,6 +107,12 @@ public:
     inline FloatArbitrary& operator*(unsigned long int op)
     {
         mpfr_mul_ui(m_Val, m_Val, op, ROUNDING_MODE);
+        return *this;
+    }
+
+    inline FloatArbitrary& operator*(const mpz_t& op)
+    {
+        mpfr_mul_z(m_Val, m_Val, op, ROUNDING_MODE);
         return *this;
     }
 
