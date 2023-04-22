@@ -15,11 +15,9 @@ project "Pi-Plotter"
         "vendor",
         "../Dependencies/gmp",
         "../Dependencies/mpfr/src",
-        "../Dependencies/math/include",
         "../Dependencies/GLFW/include",
         "../Dependencies/ImGui/include",
         "../Dependencies/implot/include",
-        "../Dependencies/multiprecision/include",
         "../Dependencies/nativefiledialog/include"
     }
 

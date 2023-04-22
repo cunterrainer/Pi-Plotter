@@ -38,17 +38,11 @@ filter {}
 flags {
     "MultiProcessorCompile"
 }
-defines {
-    "BOOST_MP_STANDALONE",
-    "BOOST_MATH_STANDALONE"
-}
 staticruntime "on"
 removeunreferencedcodedata "on"
 
 include "Pi-Plotter"
-include "Dependencies/math"
 include "Dependencies/GLFW"
 include "Dependencies/ImGui"
 include "Dependencies/implot"
-include "Dependencies/multiprecision"
 include "Dependencies/nativefiledialog"

@@ -1,8 +1,4 @@
 #pragma once
-#include <cmath>
-#include <array>
-#include "boost/multiprecision/cpp_bin_float.hpp"
-#include "boost/math/constants/constants.hpp"
 #include "mpfr.h"
 
 #include "FloatArbitrary.h"
@@ -15,9 +11,7 @@ namespace Pi
 
 namespace Pi
 {
-    namespace bm  = boost::math;
-    namespace bmp = boost::multiprecision;
-    //using Float = bmp::number<bmp::cpp_bin_float<10000>>;
+    inline constexpr double PI = 3.14159265358979323846;
     using Float = FloatArbitrary<15000>;
 
     mpz_t& Init()
@@ -64,7 +58,7 @@ namespace Pi
     
     Float Archimedes(uint32_t i)
     {
-        static Float rad(180 * (bm::constants::pi<double>() / 180.0));
+        static Float rad(180 * (PI / 180.0));
         Float a = rad;
         return (a / i).Sin() * i;
     }
