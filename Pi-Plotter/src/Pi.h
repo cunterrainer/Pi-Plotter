@@ -18,7 +18,7 @@ namespace Pi
     namespace bm  = boost::math;
     namespace bmp = boost::multiprecision;
     //using Float = bmp::number<bmp::cpp_bin_float<10000>>;
-    using Float = FloatArbitrary<150000>;
+    using Float = FloatArbitrary<15000>;
 
     mpz_t& Init()
     {
@@ -46,17 +46,17 @@ namespace Pi
         //const Float num = Math::Factorial<Float>(6 * i) * (a * i + b);
         //Float num = c * a; // c*(a*i+b);
         
-        Float num = (a * i + b) * FactTable[6*i];
+        //Float num = (a * i + b) * FactTable[6*i];
+        Float num = (a * i + b) * c.Factorial(6 * i);
         //Float num = (a * i + b) * (unsigned long)table[6*i];
         //const Float denom = Math::Factorial<Float>(3 * i) * bmp::pow(Math::Factorial<Float>(i), 3) * longNumPow;
-        Float denom = FactTable[3 * i];//c.Factorial(3 * i);
-        a = FactTable[i];
+        Float denom = c.Factorial(3 * i);//FactTable[3 * i];//c.Factorial(3 * i);
+        //a = FactTable[i];
+        a.Factorial(i);
         a.Pow(3);
         denom *= a;
         denom *= longNumPow;
         prevNumDenom += num.operator/(denom);
-        //longNumPow.Assign("-262537412640768000");
-        //longNumPow.Pow(i + 1);
         longNumPow *= longNum;
         return sumNum / prevNumDenom;
         //prevNumDenom += num / denom;

@@ -27,7 +27,7 @@ def main(iters):
     with open("../Pi-Plotter/src/FactorialTableData.h", "w") as file:
         file.write(content)
 
-iters = 200
+iters = 10000
 start = time()
 main(iters)
 print("Execution time to calculate {} factorials: {} sec(s)".format(iters, time()-start))

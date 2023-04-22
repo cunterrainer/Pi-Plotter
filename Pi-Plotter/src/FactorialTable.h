@@ -1,5 +1,6 @@
 #pragma once
 #include <array>
+
 #include "mpfr.h"
 
 #include "FactorialTableData.h"
@@ -23,5 +24,4 @@ public:
         return m_Table[index];
     }
 };
-
 inline FactorialTable FactTable;
