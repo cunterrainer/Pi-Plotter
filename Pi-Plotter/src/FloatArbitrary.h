@@ -161,12 +161,6 @@ public:
         mpfr_mul(m_Val, m_Val, other.m_Val, ROUNDING_MODE);
     }
 
-    inline void Print() const
-    {
-        mpfr_out_str(stdout, 10, 10, m_Val, ROUNDING_MODE);
-        std::cout << std::endl;
-    }
-
     inline std::string Str() const
     {
         char* abc = NULL;

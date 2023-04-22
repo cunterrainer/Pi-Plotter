@@ -6,7 +6,6 @@
 #include "mpfr.h"
 
 #include "Pi.h"
-#include "Clang.h"
 #include "Profiler.h"
 #include "RenderWindow.h"
 
