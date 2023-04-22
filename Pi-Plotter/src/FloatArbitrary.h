@@ -51,15 +51,15 @@ public:
         mpfr_set_str(m_Val, value, 10, ROUNDING_MODE);
     }
 
-    inline FloatArbitrary(const mpz_t& value)
+    inline FloatArbitrary(const MP_INT& value)
     {
         mpfr_init2(m_Val, Precision);
-        mpfr_set_z(m_Val, value, ROUNDING_MODE);
+        mpfr_set_z(m_Val, &value, ROUNDING_MODE);
     }
 
-    inline FloatArbitrary& operator=(const mpz_t& x)
+    inline FloatArbitrary& operator=(const MP_INT& x)
     {
-        mpfr_set_z(m_Val, x, ROUNDING_MODE);
+        mpfr_set_z(m_Val, &x, ROUNDING_MODE);
         return *this;
     }
 
@@ -110,9 +110,9 @@ public:
         return *this;
     }
 
-    inline FloatArbitrary& operator*(const mpz_t& op)
+    inline FloatArbitrary& operator*(const MP_INT& op)
     {
-        mpfr_mul_z(m_Val, m_Val, op, ROUNDING_MODE);
+        mpfr_mul_z(m_Val, m_Val, &op, ROUNDING_MODE);
         return *this;
     }
 

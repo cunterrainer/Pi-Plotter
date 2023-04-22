@@ -133,5 +133,6 @@ project "Pi-Plotter"
     filter { "configurations:Debug" }
         kind "ConsoleApp"
     filter { "configurations:Release" }
-        kind "WindowedApp"
-        entrypoint "mainCRTStartup"
+        kind "ConsoleApp"
+        --kind "WindowedApp"
+        --entrypoint "mainCRTStartup"

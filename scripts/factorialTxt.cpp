@@ -36,7 +36,8 @@ int main(int argc, char** argv)
     mpz_set_ui(prev, 1);
 
     ProgressBarInit();
-    std::ofstream ofs("FactorialTableData.txt");
+    std::ofstream ofs("FactorialTableData");
+    ofs << iterations << '\n';
     for (uint32_t i = 1; i <= iterations; ++i)
     {
         ProgressBar((float)i, (float)iterations);

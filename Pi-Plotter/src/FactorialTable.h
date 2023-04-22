@@ -1,25 +1,48 @@
 #pragma once
-#include <array>
+#include <vector>
+#include <string>
+#include <sstream>
+#include <fstream>
 
-#include "mpfr.h"
+#include "gmp.h"
 
-#include "FactorialTableData.h"
+#include "Log.h"
+#include "ProgressBar.h"
 
 class FactorialTable
 {
 private:
-    std::array<mpz_t, FactorialTableData.size()> m_Table;
+    std::vector<MP_INT> m_Table;
 public:
     FactorialTable()
     {
-        for (size_t i = 0; i < m_Table.size(); ++i)
+        std::ifstream data("FactorialTableData");
+        if (!data.is_open())
         {
-            mpz_init2(m_Table[i], (mp_bitcnt_t)FactorialTableData[i].size());
-            mpz_set_str(m_Table[i], FactorialTableData[i].data(), 10);
+            Err << "Failed to open [FactorialTableData] thus no factorial table was created" << Endl;
+            return;
         }
+
+        size_t i = 0;
+        std::string line;
+        std::getline(data, line);
+        size_t lines = std::stoul(line);
+
+        Log << "Creating factorial table" << Endl;
+        ProgressBarInit();
+        while (std::getline(data, line))
+        {
+            ProgressBar((float)i+1, (float)lines);
+            MP_INT val;
+            mpz_init2(&val, (mp_bitcnt_t)line.size());
+            mpz_set_str(&val, line.c_str(), 10);
+            m_Table.push_back(val);
+            ++i;
+        }
+        Log << "Created factorial table with size: " << m_Table.size() << Endl;
     }
 
-    inline mpz_t& operator[](size_t index)
+    inline MP_INT& operator[](size_t index)
     {
         return m_Table[index];
     }
