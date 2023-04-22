@@ -10,18 +10,18 @@
 
 uint32_t ParseCmd(int argc, char** argv)
 {
-    static constexpr uint32_t defaultIterations = 20000;
+    static constexpr uint32_t defaultIterations = 20001;
     if (argc == 1)
         return defaultIterations;
 
     char* endptr = nullptr;
-    uint32_t result = std::strtol(argv[1], &endptr, 10);
+    uint32_t result = std::strtoul(argv[1], &endptr, 10) + 1;
     if (*endptr != '\0')
     {
-        std::cout << "Usage: " << argv[0] << " [iterations=20000 max(" << std::numeric_limits<long>::max() << ")]" << std::endl;
+        std::cout << "Usage: " << argv[0] << " [limit=20000 max(" << std::numeric_limits<long>::max() << ")]" << std::endl;
         return 0;
     }
-    return std::max(result, (uint32_t)1);
+    return result;
 }
 
 int main(int argc, char** argv)
@@ -29,10 +29,9 @@ int main(int argc, char** argv)
     Profiler::Start();
     uint32_t iterations = ParseCmd(argc, argv);
     if (iterations == 0) return 0;
-    uint32_t precision = 10;
     std::string content;
     mpz_t prev;
-    mpz_init2(prev, precision);
+    mpz_init2(prev, 5);
     mpz_set_ui(prev, 1);
 
     ProgressBarInit();
@@ -40,32 +39,20 @@ int main(int argc, char** argv)
     ofs << iterations << '\n';
     for (uint32_t i = 1; i <= iterations; ++i)
     {
-        ProgressBar((float)i, (float)iterations);
-        char* str = mpz_get_str(NULL, 10, prev);
-        std::string prevStr(str);
-        std::free(str);
-        if (prevStr.size() == precision) // resize
-        {
-            mpz_t tmp;
-            mpz_init2(tmp, precision);
-            mpz_set(tmp, prev);
-
-            precision *= 2;
-            mpz_clear(prev);
-            mpz_init2(prev, precision);
-            mpz_set(prev, tmp);
-            mpz_clear(tmp);
-        }
-        content += prevStr + '\n';
-
+        ProgressBar((float)i-1, (float)iterations-1);
         if (content.size() > 100000)
         {
             ofs << content;
             content.clear();
         }
+        char* str = mpz_get_str(NULL, 62, prev);
+        content += str;
+        content += '\n';
         mpz_mul_ui(prev, prev, i);
+        std::free(str);
     }
     std::cout << "Writing to file..." << std::endl;
+    content.pop_back();
     ofs << content;
 
     mpz_clear(prev);
