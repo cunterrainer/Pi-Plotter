@@ -14,6 +14,7 @@ project "Pi-Plotter"
         "src",
         "vendor",
         "../Dependencies/gmp",
+        "../Dependencies/pi-data",
         "../Dependencies/mpfr/src",
         "../Dependencies/GLFW/include",
         "../Dependencies/ImGui/include",
@@ -28,6 +29,8 @@ project "Pi-Plotter"
         "../Dependencies/ImGui/include"
     }
 
+    libdirs "../Dependencies/pi-data"
+
     flags "FatalWarnings"
 
     links {
@@ -36,7 +39,8 @@ project "Pi-Plotter"
         "ImGui",
         "ImPlot",
         "gmp",
-        "mpfr"
+        "mpfr",
+        "pi-data"
     }
 
     filter "system:windows"

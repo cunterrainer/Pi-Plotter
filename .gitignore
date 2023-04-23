@@ -4,6 +4,7 @@
 
 BIN/
 scripts/__pycache__/
+Dependencies/pi-data/
 
 Makefile
 *.make
