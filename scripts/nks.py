@@ -22,7 +22,6 @@ def Chudnovsky(i):
     denom = factorial(3*i)*pow(factorial(i), 3)*Chudnovsky.longNumPow
     Chudnovsky.prevNumDenom += num/denom
     Chudnovsky.longNumPow *= Decimal(-262537412640768000)
-    print(Chudnovsky.prevNumDenom)
     return Chudnovsky.sumNum/Chudnovsky.prevNumDenom
 
 def Newton_Raphson(i):
@@ -49,15 +48,15 @@ def Measure(iterations, func):
     Chudnovsky.prevNumDenom = 0
     Chudnovsky.longNumPow = 1 #-262537412640768000^0 = 1
     Chudnovsky.sumNum = Decimal(426880)*Decimal(10005).sqrt()
-    #bar = IncrementalBar("Iteration", max=iterations, suffix="%(index)d/%(max)d %(percent).2f%%")
+    bar = IncrementalBar("Iteration", max=iterations, suffix="%(index)d/%(max)d %(percent).2f%%")
 
     for i in range(1, iterations+1):
-        #bar.next()
+        bar.next()
         same = Matches(func(i), start)
         start += same
         xpoints = np.append(xpoints, i)
         ypoints = np.append(ypoints, start)
-    #bar.finish()
+    bar.finish()
     return xpoints, ypoints
 
 def Smooth(xpoints, ypoints):
