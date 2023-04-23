@@ -1,18 +1,45 @@
 #pragma once
+#include <string>
+#include <sstream>
+#include <fstream>
+#include <string_view>
+
 #include "mpfr.h"
 
+#include "Profiler.h"
 #include "FloatArbitrary.h"
 #include "FactorialTable.h"
 
 namespace Pi
 {
 #include "pi-million.h"
+
+    const std::string_view& LoadPiStr()
+    {
+        Profiler::Start();
+        std::ifstream input("pi-billion.txt");
+        if (!input.is_open())
+        {
+            Err << "Failed to open file [pi-billion.txt] deverting to using PiMillionStr" << Endl;
+            return PiMillionStr;
+        }
+
+        std::stringstream ss;
+        ss << input.rdbuf();
+        static std::string piBillionStr = ss.str();
+        static std::string_view view(piBillionStr);
+        Profiler::End();
+        Log << "Successfully loaded pi-billion into memory" << Endl;
+        Log << "Execution time: " << Profiler::Average(Profiler::Conversion::Seconds) << " sec(s)" << Endl;
+        return view;
+    }
 }
 
 namespace Pi
 {
     inline constexpr double PI = 3.14159265358979323846;
-    using Float = FloatArbitrary<15000>;
+    using Float = FloatArbitrary<1500000>;
+    inline const std::string_view& PiStr = LoadPiStr();
 
     mpz_t& Init()
     {
@@ -69,7 +96,7 @@ namespace Pi
         std::string decStr = decNum.Str().erase(0, 1);
         for (size_t i = 0; i < decStr.size(); ++i)
         {
-            if (decStr[i] != PiMillionStr[i])
+            if (decStr[i] != PiStr[i])
                 break;
             ++same;
         }
