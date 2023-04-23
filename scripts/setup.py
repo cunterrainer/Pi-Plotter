@@ -13,9 +13,6 @@ def Execute(cmd):
         yield stdoutLine 
     popen.stdout.close()
     popen.wait()
-    #return_code = popen.wait()
-    #if return_code:
-    #    raise subprocess.CalledProcessError(return_code, cmd)
 
 def main():
     url = "https://stuff.mit.edu/afs/sipb/contrib/pi/pi-billion.txt"

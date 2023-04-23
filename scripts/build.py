@@ -1,4 +1,3 @@
-from ast import arg
 import os, shutil
 import subprocess as sp
 from termcolor import colored
@@ -19,13 +18,23 @@ def ExecProcess(args):
     for arg in args:
         print(arg, end=" ")
     print()
-    process = sp.Popen(args, stdout=sp.PIPE, stderr=sp.PIPE, universal_newlines=True)
-    stdout, stderr = process.communicate()
-    if process.returncode == 0:
-        print(colored(f"Stdout:\n{stdout}\nStderr:\n{stderr}\nReturn code: {process.returncode}", "green"), end="\n\n")
-    else:
-        print(colored(f"Stdout:\n{stdout}\nStderr:\n{stderr}\nReturn code: {process.returncode}", "red"), end="\n\n")
-    return process.returncode == 0
+
+    errors = ""
+    popen = sp.Popen(args, stdout=sp.PIPE, stderr=sp.PIPE, universal_newlines=True)
+    for stdoutLine in iter(popen.stdout.readline, ""):
+        print(colored(stdoutLine, "green"), end="")
+    for stderrLine in iter(popen.stderr.readline, ""):
+        errors += stderrLine
+        print(colored(stderrLine, "red"), end="")
+    popen.stdout.close()
+    code = popen.wait()
+    print("Return code: {}".format(code))
+
+    if len(errors) > 0:
+        print(colored("\n#################################################################################", "yellow"))
+        print(colored(f"Stderr: (The same as above just put all in one place)\n{errors}", "red"))
+    print("\n", end='')
+    return code == 0
 
 
 def ExecProcessList(argsList):
