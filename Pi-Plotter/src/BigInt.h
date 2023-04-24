@@ -5,7 +5,7 @@
 class BigInt
 {
 private:
-    mpz_t m_Val;
+    mpz_t m_Val = {0};
 private:
     template <typename Func, typename T>
     inline BigInt Operation(const Func& func, const T& op) const noexcept
@@ -39,9 +39,40 @@ public:
         mpz_set(m_Val, other.m_Val);
     }
 
+    inline BigInt& operator=(const BigInt& other) noexcept
+    {
+        mpz_set(m_Val, other.m_Val);
+        return *this;
+    }
+
+    inline BigInt(BigInt&& other) noexcept
+    {
+        m_Val->_mp_d     = other.m_Val->_mp_d;
+        m_Val->_mp_size  = other.m_Val->_mp_size;
+        m_Val->_mp_alloc = other.m_Val->_mp_alloc;
+        other.m_Val->_mp_d     = nullptr;
+        other.m_Val->_mp_size  = 0;
+        other.m_Val->_mp_alloc = 0;
+    }
+
+    inline BigInt& operator=(BigInt&& other) noexcept
+    {
+        m_Val->_mp_d     = other.m_Val->_mp_d;
+        m_Val->_mp_size  = other.m_Val->_mp_size;
+        m_Val->_mp_alloc = other.m_Val->_mp_alloc;
+        other.m_Val->_mp_d     = nullptr;
+        other.m_Val->_mp_size  = 0;
+        other.m_Val->_mp_alloc = 0;
+        return *this;
+    }
+
     inline ~BigInt() noexcept
     {
-        mpz_clear(m_Val);
+        if(m_Val->_mp_d)
+        {
+            mpz_clear(m_Val);
+            m_Val->_mp_d = nullptr;
+        }
     }
 
     inline BigInt Pow      (unsigned long int exp) const noexcept { return Operation(mpz_pow_ui, exp);   }

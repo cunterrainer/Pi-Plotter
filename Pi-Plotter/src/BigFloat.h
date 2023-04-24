@@ -86,7 +86,10 @@ public:
         m_Val->_mpfr_exp  = other.m_Val->_mpfr_exp;
         m_Val->_mpfr_prec = other.m_Val->_mpfr_prec;
         m_Val->_mpfr_sign = other.m_Val->_mpfr_sign;
-        other.m_Val->_mpfr_d = nullptr;
+        other.m_Val->_mpfr_d    = nullptr;
+        other.m_Val->_mpfr_exp  = 0;
+        other.m_Val->_mpfr_prec = 0;
+        other.m_Val->_mpfr_sign = 0;
     }
 
     inline BigFloat& operator=(BigFloat&& other) noexcept
@@ -95,7 +98,10 @@ public:
         m_Val->_mpfr_exp  = other.m_Val->_mpfr_exp;
         m_Val->_mpfr_prec = other.m_Val->_mpfr_prec;
         m_Val->_mpfr_sign = other.m_Val->_mpfr_sign;
-        other.m_Val->_mpfr_d = nullptr;
+        other.m_Val->_mpfr_d    = nullptr;
+        other.m_Val->_mpfr_exp  = 0;
+        other.m_Val->_mpfr_prec = 0;
+        other.m_Val->_mpfr_sign = 0;
         return *this;
     }
 
