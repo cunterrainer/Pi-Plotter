@@ -6,19 +6,18 @@
 
 #include "mpfr.h"
 
-#include "Profiler.h"
+#include "BigFloat.h"
 #include "pi-string.h"
-#include "FloatArbitrary.h"
 #include "FactorialTable.h"
 
 
 namespace Pi
 {
     inline constexpr double PI = 3.14159265358979323846;
-    using Float = FloatArbitrary<150000>;
+    using Float = BigFloat<150000>;
     inline const std::string_view PiStr = PiBillionStr;
 
-    mpz_t& Init()
+    mpz_t& Init() // memory wont be freed at termination
     {
         static mpz_t longNum;
         mpz_init2(longNum, 20);
@@ -31,21 +30,14 @@ namespace Pi
         static Float prevNumDenom = 0;
         static Float longNumPow = 1; // -262537412640768000^0 = 1
         static const mpz_t& longNum = Init();
-        Float sumNum = Float(426880) * Float(10005).Sqrt();
-        static Float a(545140134);
-        static const unsigned long int b = 13591409;
-        static Float c = 0;
-        c = 0;
-        a = 545140134;
-
-        //Float num = Math::Factorial<Float>(6 * i) * (a * i + b);
-        //const Float denom = Math::Factorial<Float>(3 * i) * bmp::pow(Math::Factorial<Float>(i), 3) * longNumPow;
+        static const Float sumNum = Float(426880) * Float(10005).Sqrt();
+    
         --i;
-        Float num = (a * i + b) * FactTable[6*i];
-        Float denom = FactTable[3 * i];
-        a = FactTable[i];
-        a.Pow(3);
-        denom *= a;
+        static Float a(545140134);
+        static constexpr unsigned long int b = 13591409;
+        Float num = (a * i + b) * FactTable[6 * i];
+        Float denom = FactTable[i];
+        denom = denom.Pow(3) * FactTable[3 * i];
         denom *= longNumPow;
         prevNumDenom += num / denom;
         longNumPow *= longNum;
@@ -55,8 +47,7 @@ namespace Pi
     Float Newton(uint32_t)
     {
         static Float prevSum = 3;
-        Float tan = prevSum;
-        prevSum - tan.Tan();
+        prevSum -= Float(prevSum).Tan();
         return prevSum;
     }
     

@@ -44,6 +44,7 @@ public:
         Profiler::End();
         Log << "Created factorial table" << Endl;
         Log << "Execution time: " << Profiler::Average(Profiler::Conversion::Seconds) << " sec(s)" << Endl;
+        Profiler::Reset();
     }
 
     inline ~FactorialTable()
