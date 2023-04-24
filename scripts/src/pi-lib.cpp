@@ -42,6 +42,12 @@ std::string CreateContent(const std::string& data)
 std::string ConvertFile(const char* file, const std::string& identifier)
 {
     std::ifstream input(file);
+    if(!input.is_open())
+    {
+        std::cout << "Failed to open file [" << file << "]\n";
+        return std::string();
+    }
+
     std::stringstream ss;
     ss << input.rdbuf();
     const std::string data = ss.str();
@@ -107,7 +113,7 @@ void MoveFile(const char* file, const char* newLoc)
 void RemoveDir(const std::filesystem::path& folder)
 {
     if(std::filesystem::remove_all(folder))
-            std::cout << "Successfully removed folder [" << folder << "]\n";
+        std::cout << "Successfully removed folder [" << folder << "]\n";
     else
         std::cout << "Faile to removed folder [" << folder << "]\n";
 }
@@ -130,12 +136,20 @@ void MoveLibraries()
     MoveFile(HEADER_NAME, OUT_DIR HEADER_NAME);
 }
 
+void SetEnvironment(char** argv)
+{
+    std::filesystem::path dir = std::filesystem::weakly_canonical(argv[0]).parent_path();
+    std::cout << "Changing working directory to " << dir << std::endl;
+    std::filesystem::current_path(dir);
+}
 
-int main()
+int main(int, char** argv)
 {
     Profiler::Start();
+    SetEnvironment(argv);
     std::string piMillionStr = ConvertFile("pi-million.txt", "Million");
     std::string piBillionStr = ConvertFile("pi-billion.txt", "Billion");
+    if(piBillionStr.empty() && piMillionStr.empty()) return 1;
     std::string headerContent = "#ifndef PI_STRING_H\n#define PI_STRING_H\nextern \"C\" const char* const PiMillionStr;\nextern \"C\" const char* const PiBillionStr;\n#endif";
 
     std::ofstream header(HEADER_NAME);

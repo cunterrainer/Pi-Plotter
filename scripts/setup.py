@@ -1,4 +1,4 @@
-import requests, subprocess, sys
+import requests, subprocess, sys, os
 try:
     from clint.textui import progress
 except ImportError:
@@ -38,6 +38,9 @@ def main():
 
 if __name__ == "__main__":
     try:
+        path = "/".join(os.path.realpath(__file__).replace('\\', '/').split('/')[0:-1])
+        print(f"Changing working directory to '{path}'")
+        os.chdir(path)
         main()
     except KeyboardInterrupt as ex:
         print("\nStopped due to keyboard interrupt")
