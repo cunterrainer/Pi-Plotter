@@ -62,6 +62,12 @@ public:
         mpfr_set_z(m_Val, &value, ROUNDING_MODE);
     }
 
+    inline BigFloat(const BigInt& value) noexcept
+    {
+        mpfr_init2(m_Val, Precision);
+        mpfr_set_z(m_Val, value.MPZ(), ROUNDING_MODE);
+    }
+
     inline BigFloat(const BigFloat& other) noexcept
     {
         mpfr_init2(m_Val, Precision);
@@ -105,19 +111,15 @@ public:
     inline BigFloat& Sin()  noexcept { return Operation(mpfr_sin);  }
     inline BigFloat& Tan()  noexcept { return Operation(mpfr_tan);  }
     inline BigFloat& Sqrt() noexcept { return Operation(mpfr_sqrt); }
-    inline BigFloat& Pow(unsigned long int exp) noexcept { mpfr_pow_ui(m_Val, m_Val, exp, ROUNDING_MODE); return *this; }
 
-    inline BigFloat operator+(unsigned long int op) const noexcept { return Operation(mpfr_add_ui, op);       }
     inline BigFloat operator-(const BigFloat& op)   const noexcept { return Operation(mpfr_sub,    op.m_Val); }
     inline BigFloat operator*(const BigFloat& op)   const noexcept { return Operation(mpfr_mul,    op.m_Val); }
-    inline BigFloat operator*(const BigInt& op)     const noexcept { return Operation(mpfr_mul_z,  op.MPZ()); }
     inline BigFloat operator*(unsigned long int op) const noexcept { return Operation(mpfr_mul_ui, op);       }
-    inline BigFloat operator/(unsigned long int op) const noexcept { return Operation(mpfr_div_ui, op);       }
     inline BigFloat operator/(const BigFloat& op)   const noexcept { return Operation(mpfr_div,    op.m_Val); }
+    inline BigFloat operator/(const BigInt& op)     const noexcept { return Operation(mpfr_div_z,  op.MPZ()); }
 
-    inline void operator+=(const BigFloat& op) noexcept { mpfr_add(m_Val, m_Val, op.m_Val, ROUNDING_MODE);   }
-    inline void operator-=(const BigFloat& op) noexcept { mpfr_sub(m_Val, m_Val, op.m_Val, ROUNDING_MODE);   }
-    inline void operator*=(const BigFloat& op) noexcept { mpfr_mul(m_Val, m_Val, op.m_Val, ROUNDING_MODE);   }
+    inline void operator+=(const BigFloat& op) noexcept { mpfr_add  (m_Val, m_Val, op.m_Val, ROUNDING_MODE); }
+    inline void operator-=(const BigFloat& op) noexcept { mpfr_sub  (m_Val, m_Val, op.m_Val, ROUNDING_MODE); }
 
     inline std::string Str() const
     {

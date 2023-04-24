@@ -6,6 +6,14 @@ class BigInt
 {
 private:
     mpz_t m_Val;
+private:
+    template <typename Func, typename T>
+    inline BigInt Operation(const Func& func, const T& op) const noexcept
+    {
+        BigInt tmp(*this);
+        func(tmp.m_Val, tmp.m_Val, op);
+        return tmp;
+    }
 public:
     inline BigInt(unsigned int value) noexcept
     {
@@ -13,16 +21,33 @@ public:
         mpz_set_ui(m_Val, value);
     }
 
-    inline BigInt(const char* str) noexcept
+    inline BigInt(const char* value) noexcept
     {
         mpz_init(m_Val);
-        mpz_set_str(m_Val, str, 10);
+        mpz_set_str(m_Val, value, 10);
+    }
+
+    inline BigInt(const mpz_t& value) noexcept
+    {
+        mpz_init(m_Val);
+        mpz_set(m_Val, value);
+    }
+
+    inline BigInt(const BigInt& other) noexcept
+    {
+        mpz_init(m_Val);
+        mpz_set(m_Val, other.m_Val);
     }
 
     inline ~BigInt() noexcept
     {
         mpz_clear(m_Val);
     }
+
+    inline BigInt Pow      (unsigned long int exp) const noexcept { return Operation(mpz_pow_ui, exp);   }
+    inline BigInt operator+(unsigned long int op)  const noexcept { return Operation(mpz_add_ui, op);    }
+    inline BigInt operator*(unsigned long int op)  const noexcept { return Operation(mpz_mul_ui, op);    }
+    inline BigInt operator*(const BigInt& op)      const noexcept { return Operation(mpz_mul, op.m_Val); }
 
     inline const mpz_t& MPZ() const noexcept { return m_Val; }
     inline void operator*=(const BigInt& op) noexcept { mpz_mul(m_Val, m_Val, op.m_Val); }

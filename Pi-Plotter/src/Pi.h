@@ -20,14 +20,14 @@ namespace Pi
     {
         static constexpr unsigned long int b = 13591409;
         static const BigInt longNum = "-262537412640768000";
+        static const BigInt a = 545140134;
         static const Float sumNum = Float(426880) * Float(10005).Sqrt();
-        static const Float a = 545140134;
         static BigInt longNumPow = 1; // -262537412640768000^0 = 1
         static Float prevNumDenom = 0;
     
         --i;
-        const Float num = (a * i + b) * FactTable[6 * i];
-        const Float denom = Float(FactTable[i]).Pow(3) * FactTable[3 * i] * longNumPow;
+        const Float num = FactTable[6 * i] * (a * i + b);
+        const BigInt denom = FactTable[i].Pow(3) * FactTable[3 * i] * longNumPow;
         prevNumDenom += num / denom;
         longNumPow *= longNum;
         return sumNum / prevNumDenom;
