@@ -81,5 +81,6 @@ public:
     inline BigInt operator*(const BigInt& op)      const noexcept { return Operation(mpz_mul, op.m_Val); }
 
     inline const mpz_t& MPZ() const noexcept { return m_Val; }
-    inline void operator*=(const BigInt& op) noexcept { mpz_mul(m_Val, m_Val, op.m_Val); }
+    inline void operator*=(const BigInt& op)     noexcept { mpz_mul(m_Val, m_Val, op.m_Val); }
+    inline void operator*=(unsigned long int op) noexcept { mpz_mul_ui(m_Val, m_Val, op);    }
 };

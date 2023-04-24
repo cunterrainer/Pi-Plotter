@@ -23,10 +23,8 @@ public:
         constexpr unsigned long limit = 100000;
         Log << "Creating factorial table up to " << limit << Endl;
         Profiler::Start();
-        mpz_t prev;
-        mpz_init(prev);
-        mpz_set_ui(prev, 1);
-    
+
+        BigInt prev = 1;
         m_Table.reserve(limit);
         ProgressBarInit();
         for (unsigned long i = 1; i <= limit; ++i)
@@ -34,9 +32,9 @@ public:
             if(i % 1000 == 0)
                 ProgressBar((float)i, (float)limit);
             m_Table.emplace_back(prev);
-            mpz_mul_ui(prev, prev, i);
+            prev *= i;
         }
-        mpz_clear(prev);
+
         Profiler::End();
         Log << "Created factorial table" << Endl;
         Log << "Execution time: " << Profiler::Average(Profiler::Conversion::Seconds) << " sec(s)" << Endl;
