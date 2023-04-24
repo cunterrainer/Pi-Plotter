@@ -4,8 +4,7 @@
 #include <fstream>
 #include <string_view>
 
-#include "mpfr.h"
-
+#include "BigInt.h"
 #include "BigFloat.h"
 #include "pi-string.h"
 #include "FactorialTable.h"
@@ -17,28 +16,18 @@ namespace Pi
     using Float = BigFloat<150000>;
     inline const std::string_view PiStr = PiBillionStr;
 
-    mpz_t& Init() // memory wont be freed at termination
-    {
-        static mpz_t longNum;
-        mpz_init2(longNum, 20);
-        mpz_set_str(longNum, "-262537412640768000", 10);
-        return longNum;
-    }
-
     Float Chudnovsky(uint32_t i)
     {
-        static Float prevNumDenom = 0;
-        static Float longNumPow = 1; // -262537412640768000^0 = 1
-        static const mpz_t& longNum = Init();
+        static constexpr unsigned long int b = 13591409;
+        static const BigInt longNum = "-262537412640768000";
         static const Float sumNum = Float(426880) * Float(10005).Sqrt();
+        static const Float a = 545140134;
+        static BigInt longNumPow = 1; // -262537412640768000^0 = 1
+        static Float prevNumDenom = 0;
     
         --i;
-        static Float a(545140134);
-        static constexpr unsigned long int b = 13591409;
-        Float num = (a * i + b) * FactTable[6 * i];
-        Float denom = FactTable[i];
-        denom = denom.Pow(3) * FactTable[3 * i];
-        denom *= longNumPow;
+        const Float num = (a * i + b) * FactTable[6 * i];
+        const Float denom = Float(FactTable[i]).Pow(3) * FactTable[3 * i] * longNumPow;
         prevNumDenom += num / denom;
         longNumPow *= longNum;
         return sumNum / prevNumDenom;

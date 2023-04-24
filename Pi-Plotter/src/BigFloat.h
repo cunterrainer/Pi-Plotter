@@ -3,6 +3,8 @@
 
 #include "mpfr.h"
 
+#include "BigInt.h"
+
 #define ROUNDING_MODE MPFR_RNDD
 
 /*
@@ -108,15 +110,14 @@ public:
     inline BigFloat operator+(unsigned long int op) const noexcept { return Operation(mpfr_add_ui, op);       }
     inline BigFloat operator-(const BigFloat& op)   const noexcept { return Operation(mpfr_sub,    op.m_Val); }
     inline BigFloat operator*(const BigFloat& op)   const noexcept { return Operation(mpfr_mul,    op.m_Val); }
-    inline BigFloat operator*(const MP_INT& op)     const noexcept { return Operation(mpfr_mul_z,  &op);      }
+    inline BigFloat operator*(const BigInt& op)     const noexcept { return Operation(mpfr_mul_z,  op.MPZ()); }
     inline BigFloat operator*(unsigned long int op) const noexcept { return Operation(mpfr_mul_ui, op);       }
     inline BigFloat operator/(unsigned long int op) const noexcept { return Operation(mpfr_div_ui, op);       }
     inline BigFloat operator/(const BigFloat& op)   const noexcept { return Operation(mpfr_div,    op.m_Val); }
 
-    inline void operator+=(const BigFloat& op) noexcept { mpfr_add(m_Val, m_Val, op.m_Val, ROUNDING_MODE); }
-    inline void operator-=(const BigFloat& op) noexcept { mpfr_sub(m_Val, m_Val, op.m_Val, ROUNDING_MODE); }
-    inline void operator*=(const BigFloat& op) noexcept { mpfr_mul(m_Val, m_Val, op.m_Val, ROUNDING_MODE); }
-    inline void operator*=(const mpz_t& op)    noexcept { mpfr_mul_z(m_Val, m_Val, op, ROUNDING_MODE);     }
+    inline void operator+=(const BigFloat& op) noexcept { mpfr_add(m_Val, m_Val, op.m_Val, ROUNDING_MODE);   }
+    inline void operator-=(const BigFloat& op) noexcept { mpfr_sub(m_Val, m_Val, op.m_Val, ROUNDING_MODE);   }
+    inline void operator*=(const BigFloat& op) noexcept { mpfr_mul(m_Val, m_Val, op.m_Val, ROUNDING_MODE);   }
 
     inline std::string Str() const
     {
