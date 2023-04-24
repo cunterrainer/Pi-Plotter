@@ -14,9 +14,11 @@ template <typename Func>
 inline void Calculate(RenderWindow* window, Func func, uint8_t identifier)
 {
     uint32_t i = 1;
+    uint32_t start = 0;
     while (i <= 1000 && !StopThreads)
     {
-        window->Add(i, Pi::Measure(i, func), identifier);
+        start += Pi::Matches(func(i), start);
+        window->Add(i, start, identifier);
         ++i;
     }
 }

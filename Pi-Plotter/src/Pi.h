@@ -15,8 +15,8 @@
 namespace Pi
 {
     inline constexpr double PI = 3.14159265358979323846;
-    using Float = FloatArbitrary<15000>;
-    inline const std::string_view& PiStr = PiMillionStr;
+    using Float = FloatArbitrary<150000>;
+    inline const std::string_view PiStr = PiBillionStr;
 
     mpz_t& Init()
     {
@@ -67,25 +67,12 @@ namespace Pi
         return (a / i).Sin() * i;
     }
 
-    uint32_t Matches(const Float& decNum, uint32_t)
+    uint32_t Matches(const Float& decNum, uint32_t start)
     {
-        uint32_t same = 0;
-        std::string decStr = decNum.Str().erase(0, 1);
-        for (size_t i = 0; i < decStr.size(); ++i)
-        {
-            if (decStr[i] != PiStr[i])
-                break;
-            ++same;
-        }
-        return same;
-    }
+        const std::string decStr = decNum.Str().erase(0, 1);
 
-    template <class Func>
-    uint32_t Measure(uint32_t i, Func func)
-    {
-        static uint32_t start = 0;
-        uint32_t same = Matches(func(i), start);
-        start += same;
-        return same;
+        uint32_t i = start;
+        while (i < decStr.size() && decStr[i] == PiStr[i]) ++i;
+        return i - start;
     }
 }
