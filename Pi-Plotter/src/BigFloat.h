@@ -16,12 +16,18 @@
 template <size_t DecimalPlaces>
 class BigFloat
 {
-public:
     static_assert(DecimalPlaces != 0, "DecimalPlaces has to be greater than 0!");
 private:
     static constexpr size_t Precision = (size_t)(3.5 * DecimalPlaces);
     mpfr_t m_Val = {0};
 private:
+    template <typename Func>
+    inline BigFloat& Operation(const Func& func) noexcept
+    {
+        func(m_Val, m_Val, ROUNDING_MODE);
+        return *this;
+    }
+
     template <typename Func, typename T>
     inline BigFloat Operation(const Func& func, const T& op) const noexcept
     {
@@ -88,32 +94,16 @@ public:
     inline ~BigFloat() noexcept
     {
         if (m_Val->_mpfr_d)
+        {
             mpfr_clear(m_Val);
+            m_Val->_mpfr_d = nullptr;
+        }
     }
 
-    inline BigFloat& Pow(unsigned long int exp) noexcept
-    {
-        mpfr_pow_ui(m_Val, m_Val, exp, ROUNDING_MODE);
-        return *this;
-    }
-
-    inline BigFloat& Sqrt() noexcept
-    {
-        mpfr_sqrt(m_Val, m_Val, ROUNDING_MODE);
-        return *this;
-    }
-
-    inline BigFloat& Sin() noexcept
-    {
-        mpfr_sin(m_Val, m_Val, ROUNDING_MODE);
-        return *this;
-    }
-
-    inline BigFloat& Tan() noexcept
-    {
-        mpfr_tan(m_Val, m_Val, ROUNDING_MODE);
-        return *this;
-    }
+    inline BigFloat& Sin()  noexcept { return Operation(mpfr_sin);  }
+    inline BigFloat& Tan()  noexcept { return Operation(mpfr_tan);  }
+    inline BigFloat& Sqrt() noexcept { return Operation(mpfr_sqrt); }
+    inline BigFloat& Pow(unsigned long int exp) noexcept { mpfr_pow_ui(m_Val, m_Val, exp, ROUNDING_MODE); return *this; }
 
     inline BigFloat operator+(unsigned long int op) const noexcept { return Operation(mpfr_add_ui, op);       }
     inline BigFloat operator-(const BigFloat& op)   const noexcept { return Operation(mpfr_sub,    op.m_Val); }
