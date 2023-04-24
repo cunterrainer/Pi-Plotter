@@ -14,29 +14,22 @@ private:
         func(tmp.m_Val, tmp.m_Val, op);
         return tmp;
     }
-public:
-    inline BigInt(unsigned int value) noexcept
+
+    template <typename Func, typename T>
+    inline void Construct(const Func& func, const T& value)
     {
         mpz_init(m_Val);
-        mpz_set_ui(m_Val, value);
+        func(m_Val, value);
     }
+public:
+    inline BigInt(const mpz_t& value)      noexcept { Construct(mpz_set, value);       }
+    inline BigInt(const BigInt& other)     noexcept { Construct(mpz_set, other.m_Val); } // copy
+    inline BigInt(unsigned long int value) noexcept { Construct(mpz_set_ui, value);    }
 
     inline BigInt(const char* value) noexcept
     {
         mpz_init(m_Val);
         mpz_set_str(m_Val, value, 10);
-    }
-
-    inline BigInt(const mpz_t& value) noexcept
-    {
-        mpz_init(m_Val);
-        mpz_set(m_Val, value);
-    }
-
-    inline BigInt(const BigInt& other) noexcept
-    {
-        mpz_init(m_Val);
-        mpz_set(m_Val, other.m_Val);
     }
 
     inline BigInt& operator=(const BigInt& other) noexcept

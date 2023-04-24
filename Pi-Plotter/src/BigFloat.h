@@ -37,41 +37,23 @@ private:
         func(tmp.m_Val, tmp.m_Val, op, ROUNDING_MODE);
         return tmp;
     }
-public:
-    inline BigFloat(int value) noexcept
-    {
-        mpfr_init2(m_Val, Precision);
-        mpfr_set_si(m_Val, value, ROUNDING_MODE);
-    }
 
-    inline BigFloat(double value) noexcept
+    template <typename Func, typename T>
+    inline void Construct(const Func& func, const T& value)
     {
         mpfr_init2(m_Val, Precision);
-        mpfr_set_d(m_Val, value, ROUNDING_MODE);
+        func(m_Val, value, ROUNDING_MODE);
     }
+public:
+    inline BigFloat(int value)             noexcept { Construct(mpfr_set_si, value);       }
+    inline BigFloat(double value)          noexcept { Construct(mpfr_set_d,  value);       }
+    inline BigFloat(const BigInt& value)   noexcept { Construct(mpfr_set_z,  value.MPZ()); }
+    inline BigFloat(const BigFloat& other) noexcept { Construct(mpfr_set, other.m_Val);    } // copy
 
     inline BigFloat(const char* value) noexcept
     {
         mpfr_init2(m_Val, Precision);
         mpfr_set_str(m_Val, value, 10, ROUNDING_MODE);
-    }
-
-    inline BigFloat(const MP_INT& value) noexcept
-    {
-        mpfr_init2(m_Val, Precision);
-        mpfr_set_z(m_Val, &value, ROUNDING_MODE);
-    }
-
-    inline BigFloat(const BigInt& value) noexcept
-    {
-        mpfr_init2(m_Val, Precision);
-        mpfr_set_z(m_Val, value.MPZ(), ROUNDING_MODE);
-    }
-
-    inline BigFloat(const BigFloat& other) noexcept
-    {
-        mpfr_init2(m_Val, Precision);
-        mpfr_set(m_Val, other.m_Val, ROUNDING_MODE);
     }
 
     inline BigFloat& operator=(const BigFloat& other) noexcept
