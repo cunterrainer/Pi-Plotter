@@ -49,8 +49,7 @@ namespace Pi
 
     uint32_t Matches(const Float& decNum, uint32_t start)
     {
-        const std::string decStr = decNum.Str().erase(0, 1);
-
+        const std::string_view decStr = decNum.Str();
         uint32_t i = start;
         while (i < decStr.size() && decStr[i] == PiStr[i]) ++i;
         return i - start;

@@ -32,7 +32,7 @@ private:
 private:
     static inline bool Log(long double nanosecConversion, const char* name, bool resetOnLog)
     {
-        std::cout << "[Profiler] " << name << " Count: " << Count() << " Average: " << Average(nanosecConversion) << ' ' << TimeAbbreviations[nanosecConversion] << '\n';
+        std::cout << "[Profiler] " << name << " Count: " << Count() << " Average: " << Average(nanosecConversion) << ' ' << TimeAbbreviations[nanosecConversion] << " Total: " << Total(nanosecConversion) << ' ' << TimeAbbreviations[nanosecConversion] << '\n';
         if (resetOnLog)
             Profiler::Reset();
         return true;
@@ -49,6 +49,11 @@ public:
         AccumulatedTime += std::chrono::duration_cast<std::chrono::nanoseconds>(now - StartTime);
         if(increaseCounter)
             ++Counter;
+    }
+
+    static long double Total(long double nanosecConversion = Conversion::Nanoseconds)
+    {
+        return (long double)AccumulatedTime.count() * nanosecConversion;
     }
 
     static long double Average(long double nanosecConversion = Conversion::Nanoseconds)

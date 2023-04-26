@@ -1,5 +1,6 @@
 #pragma once
 #include <string>
+#include <string_view>
 
 #include "mpfr.h"
 
@@ -22,6 +23,8 @@ class BigFloat
 private:
     static constexpr size_t Precision = (size_t)(3.5 * DecimalPlaces);
     mpfr_t m_Val = {0};
+    std::string m_Format = "%." + std::to_string(Precision) + "RDf";
+    mutable std::string m_Str = std::string(Precision + 2, 0);
 private:
     template <typename Func>
     inline BigFloat& Operation(const Func& func) noexcept
@@ -109,13 +112,9 @@ public:
     inline void operator+=(const BigFloat& op) noexcept { mpfr_add  (m_Val, m_Val, op.m_Val, ROUNDING_MODE); }
     inline void operator-=(const BigFloat& op) noexcept { mpfr_sub  (m_Val, m_Val, op.m_Val, ROUNDING_MODE); }
 
-    inline std::string Str() const
+    inline std::string_view Str() const
     {
-        char* abc = NULL;
-        mpfr_exp_t i = 0;
-        abc = mpfr_get_str(NULL, &i, 10, Precision, m_Val, ROUNDING_MODE);
-        std::string ret(abc);
-        mpfr_free_str(abc);
-        return ret;
+        mpfr_sprintf(m_Str.data(), m_Format.c_str(), m_Val);
+        return { &m_Str.c_str()[2], Precision };
     }
 };
