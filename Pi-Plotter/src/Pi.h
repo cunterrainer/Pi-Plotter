@@ -27,7 +27,7 @@ namespace Pi
         static const FloatC sumNum = FloatC(426880) * FloatC(10005).Sqrt();
         static BigInt longNumPow = 1; // -262537412640768000^0 = 1
         static FloatC prevNumDenom = 0;
-    
+
         --i;
         const FloatC num = FactTable[6 * i] * (a * i + b);
         const BigInt denom = FactTable[i].Pow(3) * FactTable[3 * i] * longNumPow;

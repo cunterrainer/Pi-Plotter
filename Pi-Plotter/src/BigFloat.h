@@ -20,9 +20,8 @@ template <size_t DecimalPlaces>
 class BigFloat
 {
     static_assert(DecimalPlaces != 0, "DecimalPlaces has to be greater than 0!");
-public:
-    static constexpr size_t Precision = (size_t)(3.5 * DecimalPlaces);
 private:
+    static constexpr size_t Precision = (size_t)(3.5 * DecimalPlaces);
     static inline const std::string s_Format = "%." + std::to_string(Precision) + "RDf";
     static inline std::string s_Str = std::string(Precision + 2, 0);
 private:
