@@ -5,7 +5,7 @@
 class BigInt
 {
 private:
-    mpz_t m_Val = {0};
+    mpz_t m_Val;
 private:
     template <typename Func, typename T>
     inline BigInt Operation(const Func& func, const T& op) const noexcept

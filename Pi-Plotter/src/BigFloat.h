@@ -25,7 +25,7 @@ private:
     static inline const std::string s_Format = "%." + std::to_string(Precision) + "RDf";
     static inline std::string s_Str = std::string(Precision + 2, 0);
 private:
-    mpfr_t m_Val = {0};
+    mpfr_t m_Val;
 private:
     template <typename Func>
     inline BigFloat& Operation(const Func& func) noexcept
@@ -109,6 +109,7 @@ public:
     inline BigFloat operator*(unsigned long int op) const noexcept { return Operation(mpfr_mul_ui, op);       }
     inline BigFloat operator/(const BigFloat& op)   const noexcept { return Operation(mpfr_div,    op.m_Val); }
     inline BigFloat operator/(const BigInt& op)     const noexcept { return Operation(mpfr_div_z,  op.MPZ()); }
+    inline BigFloat operator/(unsigned long op)     const noexcept { return Operation(mpfr_div_ui, op);       }
 
     inline void operator+=(const BigFloat& op) noexcept { mpfr_add  (m_Val, m_Val, op.m_Val, ROUNDING_MODE); }
     inline void operator-=(const BigFloat& op) noexcept { mpfr_sub  (m_Val, m_Val, op.m_Val, ROUNDING_MODE); }
