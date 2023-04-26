@@ -12,6 +12,8 @@ class FactorialTable
 {
 private:
     std::vector<BigInt> m_Table;
+    size_t m_Limit = 100000;
+private:
 public:
     inline FactorialTable(const FactorialTable&) = delete;
     inline FactorialTable(FactorialTable&&) = delete;
@@ -20,21 +22,20 @@ public:
 
     inline FactorialTable()
     {
-        constexpr unsigned long limit = 100000;
-        Log << "Creating factorial table up to " << limit << Endl;
+        Log << "Creating factorial table up to " << m_Limit << Endl;
         Profiler::Start();
-
+        
         BigInt prev = 1;
-        m_Table.reserve(limit);
+        m_Table.reserve(m_Limit);
         ProgressBarInit();
-        for (unsigned long i = 1; i <= limit; ++i)
+        for (unsigned long i = 1; i <= m_Limit; ++i)
         {
             if(i % 1000 == 0)
-                ProgressBar((float)i, (float)limit);
+                ProgressBar((float)i, (float)m_Limit);
             m_Table.emplace_back(prev);
             prev *= i;
         }
-
+        
         Profiler::End();
         Log << "Created factorial table" << Endl;
         Log << "Execution time: " << Profiler::Average(Profiler::Conversion::Seconds) << " sec(s)" << Endl;
@@ -43,7 +44,10 @@ public:
 
     inline const BigInt& operator[](size_t index) const
     {
-        return m_Table[index];
+        if(index < m_Limit)
+            return m_Table[index];
+        static BigInt fac = 1;
+        return fac.Factorial((unsigned long)index);
     }
 };
 inline const FactorialTable FactTable;

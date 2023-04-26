@@ -20,11 +20,13 @@ template <size_t DecimalPlaces>
 class BigFloat
 {
     static_assert(DecimalPlaces != 0, "DecimalPlaces has to be greater than 0!");
-private:
+public:
     static constexpr size_t Precision = (size_t)(3.5 * DecimalPlaces);
+private:
+    static inline const std::string s_Format = "%." + std::to_string(Precision) + "RDf";
+    static inline std::string s_Str = std::string(Precision + 2, 0);
+private:
     mpfr_t m_Val = {0};
-    std::string m_Format = "%." + std::to_string(Precision) + "RDf";
-    mutable std::string m_Str = std::string(Precision + 2, 0);
 private:
     template <typename Func>
     inline BigFloat& Operation(const Func& func) noexcept
@@ -114,7 +116,7 @@ public:
 
     inline std::string_view Str() const
     {
-        mpfr_sprintf(m_Str.data(), m_Format.c_str(), m_Val);
-        return { &m_Str.c_str()[2], Precision };
+        mpfr_sprintf(s_Str.data(), s_Format.c_str(), m_Val);
+        return { &s_Str.c_str()[2], Precision };
     }
 };

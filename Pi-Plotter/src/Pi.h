@@ -13,41 +13,45 @@
 namespace Pi
 {
     inline constexpr double PI = 3.14159265358979323846;
-    using Float = BigFloat<150000>;
     inline const std::string_view PiStr = PiBillionStr;
+    using FloatA = BigFloat<100>;
+    using FloatC = BigFloat<150000>;
+    using FloatN = BigFloat<3000000>;
+    static_assert(!std::disjunction_v<std::is_same<FloatA, FloatC>, std::is_same<FloatA, FloatN>, std::is_same<FloatC, FloatN>>, "FloatA & FloatC & FloatN have to be different types (different 'DecimalPlaces' parameters)");
 
-    Float Chudnovsky(uint32_t i)
+    FloatC Chudnovsky(uint32_t i)
     {
         static constexpr unsigned long int b = 13591409;
         static const BigInt longNum = "-262537412640768000";
         static const BigInt a = 545140134;
-        static const Float sumNum = Float(426880) * Float(10005).Sqrt();
+        static const FloatC sumNum = FloatC(426880) * FloatC(10005).Sqrt();
         static BigInt longNumPow = 1; // -262537412640768000^0 = 1
-        static Float prevNumDenom = 0;
+        static FloatC prevNumDenom = 0;
     
         --i;
-        const Float num = FactTable[6 * i] * (a * i + b);
+        const FloatC num = FactTable[6 * i] * (a * i + b);
         const BigInt denom = FactTable[i].Pow(3) * FactTable[3 * i] * longNumPow;
         prevNumDenom += num / denom;
         longNumPow *= longNum;
-        return sumNum / prevNumDenom;
+        return (sumNum / prevNumDenom);
     }
 
-    Float Newton(uint32_t)
+    FloatN Newton(uint32_t)
     {
-        static Float prevSum = 3;
-        prevSum -= Float(prevSum).Tan();
+        static FloatN prevSum = 3;
+        prevSum -= FloatN(prevSum).Tan();
         return prevSum;
     }
     
-    Float Archimedes(uint32_t i)
+    FloatA Archimedes(uint32_t i)
     {
-        static Float rad(180 * (PI / 180.0));
-        Float a = rad;
+        static FloatA rad(180 * (PI / 180.0));
+        FloatA a = rad;
         return (a / i).Sin() * i;
     }
 
-    uint32_t Matches(const Float& decNum, uint32_t start)
+    template <typename FloatVariant>
+    uint32_t Matches(const FloatVariant& decNum, uint32_t start)
     {
         const std::string_view decStr = decNum.Str();
         uint32_t i = start;

@@ -68,10 +68,11 @@ public:
         }
     }
 
-    inline BigInt Pow      (unsigned long int exp) const noexcept { return Operation(mpz_pow_ui, exp);   }
-    inline BigInt operator+(unsigned long int op)  const noexcept { return Operation(mpz_add_ui, op);    }
-    inline BigInt operator*(unsigned long int op)  const noexcept { return Operation(mpz_mul_ui, op);    }
-    inline BigInt operator*(const BigInt& op)      const noexcept { return Operation(mpz_mul, op.m_Val); }
+    inline BigInt  Pow      (unsigned long int exp) const noexcept { return Operation(mpz_pow_ui, exp);   }
+    inline BigInt  operator+(unsigned long int op)  const noexcept { return Operation(mpz_add_ui, op);    }
+    inline BigInt  operator*(unsigned long int op)  const noexcept { return Operation(mpz_mul_ui, op);    }
+    inline BigInt  operator*(const BigInt& op)      const noexcept { return Operation(mpz_mul, op.m_Val); }
+    inline BigInt& Factorial(unsigned long int op)        noexcept { mpz_fac_ui(m_Val, op); return *this; }
 
     inline const mpz_t& MPZ() const noexcept { return m_Val; }
     inline void operator*=(const BigInt& op)     noexcept { mpz_mul(m_Val, m_Val, op.m_Val); }
