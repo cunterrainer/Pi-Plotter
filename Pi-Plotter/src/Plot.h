@@ -37,6 +37,12 @@ private:
 public:
     inline explicit Plot(const char* name) : m_Name(name) {}
 
+    inline void Reset() noexcept
+    {
+        m_Xs.clear();
+        m_Ys.clear();
+    }
+
     inline void Add(T x, T y)
     {
         std::lock_guard lock(m_Mutex);
@@ -48,10 +54,10 @@ public:
     }
 
 
-    inline void Render(ImVec2 size, float xOffset)
+    inline void Render(ImVec2 size, float xOffset, float yOffset)
     {
         ImGui::SetNextWindowSize(size);
-        ImGui::SetNextWindowPos({ xOffset, 0 });
+        ImGui::SetNextWindowPos({ xOffset, yOffset });
         ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
         ImGui::Begin(m_Name, nullptr, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoTitleBar);
 

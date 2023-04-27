@@ -16,7 +16,7 @@ namespace Pi
     inline const std::string_view PiStr = PiBillionStr;
     using FloatA = BigFloat<100>;
     using FloatC = BigFloat<150000>;
-    using FloatN = BigFloat<3000000>;
+    using FloatN = BigFloat<100000>;
     static_assert(!std::disjunction_v<std::is_same<FloatA, FloatC>, std::is_same<FloatA, FloatN>, std::is_same<FloatC, FloatN>>, "FloatA & FloatC & FloatN have to be different types (different 'DecimalPlaces' parameters)");
 
     FloatC Chudnovsky(uint32_t i)

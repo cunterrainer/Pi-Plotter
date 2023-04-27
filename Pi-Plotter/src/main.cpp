@@ -30,20 +30,23 @@ inline void Calculate(RenderWindow* window, Func func, uint8_t identifier)
 int main()
 {
     RenderWindow window;
-    std::thread archimedes(Calculate<decltype(Pi::Archimedes), 1000000000, 100>, &window, Pi::Archimedes, 0);
-    std::thread chudnovsky(Calculate<decltype(Pi::Chudnovsky), 100000, 100>, &window, Pi::Chudnovsky, 1);
-    std::thread newton(Calculate<decltype(Pi::Newton), 20, 1>, &window, Pi::Newton, 2);
+    std::thread archimedes;
+    std::thread chudnovsky;
+    std::thread newton;
+    auto stopThreads = [&]() { StopThreads = true; archimedes.join(); chudnovsky.join(); newton.join(); StopThreads = false; };
 
     while (window.IsOpen())
     {
-        window.Show();
+        if (window.Show())
+        {
+            archimedes = std::thread(Calculate<decltype(Pi::Archimedes), 1000000000, 100>, &window, Pi::Archimedes, 0);
+            chudnovsky = std::thread(Calculate<decltype(Pi::Chudnovsky), 100000, 100>, &window, Pi::Chudnovsky, 1);
+            newton = std::thread(Calculate<decltype(Pi::Newton), 20, 1>, &window, Pi::Newton, 2);
+        }
         window.EndFrame();
     }
 
-    StopThreads = true;
-    archimedes.join();
-    chudnovsky.join();
-    newton.join();
+    stopThreads();
     mpfr_free_cache();
     return 0;
 }

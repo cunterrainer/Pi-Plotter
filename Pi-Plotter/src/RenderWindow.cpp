@@ -176,15 +176,22 @@ void RenderWindow::ImGuiSetTheme() const noexcept
 }
 
 
-void RenderWindow::Show() noexcept
+bool RenderWindow::Show() noexcept
 {
     ImGuiStartFrame();
     const ImVec2 size = Size();
-    const ImVec2 plotSize{size.x / 3.f, size.y};
+    const ImVec2 plotSize{size.x / 3.f, size.y - SettingHeight};
 
-    m_Archimedes.Render(plotSize, 0);
-    m_Chudnovsky.Render(plotSize, plotSize.x);
-    m_Newton.Render(plotSize, plotSize.x * 2.f);
+    ImGui::SetNextWindowPos({ 0,0 });
+    ImGui::SetNextWindowSize({size.x, SettingHeight });
+    ImGui::Begin("##Setup", nullptr, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize);
+    const bool ret = ImGui::Button("Start", {150.f, 0.f});
+    ImGui::End();
+
+    m_Archimedes.Render(plotSize, 0, SettingHeight);
+    m_Chudnovsky.Render(plotSize, plotSize.x, SettingHeight);
+    m_Newton.Render(plotSize, plotSize.x * 2.f, SettingHeight);
+    return ret;
 }
 
 

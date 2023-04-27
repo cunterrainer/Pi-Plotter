@@ -11,6 +11,8 @@
 class RenderWindow
 {
 private:
+	static inline constexpr float SettingHeight = 43.f;
+private:
 	GLFWwindow* m_Window = nullptr;
 	Plot<uint32_t> m_Archimedes{"Archimedes"};
 	Plot<uint32_t> m_Chudnovsky{"Chudnovsky"};
@@ -33,11 +35,15 @@ public:
 	inline bool IsOpen()     const noexcept { return !glfwWindowShouldClose(m_Window);      }
 	inline void EndFrame()   const noexcept { Clear(); ImGuiRender(); PollEvents(); Swap(); }
 	inline ImVec2 Size() const noexcept { const ImGuiIO& io = ImGui::GetIO(); return { io.DisplaySize.x, io.DisplaySize.y }; }
-	void Show() noexcept;
+	bool Show() noexcept;
 
-	inline void AddArchimedes(uint32_t x, uint32_t y) { m_Archimedes.Add(x, y); }
-	inline void AddChudnovsky(uint32_t x, uint32_t y) { m_Chudnovsky.Add(x, y); }
-	inline void AddNewton(uint32_t x, uint32_t y)     { m_Newton.Add(x, y);     }
+	inline void ResetPlots()
+	{
+		m_Archimedes.Reset();
+		m_Chudnovsky.Reset();
+		m_Newton.Reset();
+	}
+
 	inline void Add(uint32_t x, uint32_t y, uint8_t identifier)
 	{
 		switch (identifier)
