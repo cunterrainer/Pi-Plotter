@@ -9,25 +9,30 @@
 #include "RenderWindow.h"
 
 inline std::atomic_bool StopThreads = false;
-template <typename Func>
+template <typename Func, uint32_t Iterations, uint32_t iterMod>
 inline void Calculate(RenderWindow* window, Func func, uint8_t identifier)
 {
-    uint32_t i = 1;
+    static_assert(Iterations % iterMod == 0, "Iterations & iterMod must satisfy: 'Iterations % iterMod == 0'");
+    static_assert(Iterations != 0 && iterMod != 0, "Iterations & iterMod must satisfy: 'Iterations > 0 & iterMod > 0'");
     uint32_t start = 0;
-    while (i <= 1000 && !StopThreads)
+    window->Add(0, 0, identifier);
+    for (uint32_t i = 1; i <= Iterations && !StopThreads; ++i)
     {
-        start += Pi::Matches(func(i), start);
-        window->Add(i, start, identifier);
-        ++i;
+        const auto value = func(i);
+        if (i % iterMod == 0 || i == 1)
+        {
+            start += Pi::Matches(value, start);
+            window->Add(i, start, identifier);
+        }
     }
 }
 
 int main()
 {
     RenderWindow window;
-    std::thread archimedes(Calculate<decltype(Pi::Archimedes)>, &window, Pi::Archimedes, 0);
-    std::thread chudnovsky(Calculate<decltype(Pi::Chudnovsky)>, &window, Pi::Chudnovsky, 1);
-    std::thread newton(Calculate<decltype(Pi::Newton)>, &window, Pi::Newton, 2);
+    std::thread archimedes(Calculate<decltype(Pi::Archimedes), 1000000000, 100>, &window, Pi::Archimedes, 0);
+    std::thread chudnovsky(Calculate<decltype(Pi::Chudnovsky), 100000, 100>, &window, Pi::Chudnovsky, 1);
+    std::thread newton(Calculate<decltype(Pi::Newton), 20, 1>, &window, Pi::Newton, 2);
 
     while (window.IsOpen())
     {
