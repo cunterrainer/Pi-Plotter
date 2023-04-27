@@ -176,7 +176,7 @@ void RenderWindow::ImGuiSetTheme() const noexcept
 }
 
 
-bool RenderWindow::Show() noexcept
+bool RenderWindow::Show(bool started) noexcept
 {
     ImGuiStartFrame();
     const ImVec2 size = Size();
@@ -185,7 +185,7 @@ bool RenderWindow::Show() noexcept
     ImGui::SetNextWindowPos({ 0,0 });
     ImGui::SetNextWindowSize({size.x, SettingHeight });
     ImGui::Begin("##Setup", nullptr, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize);
-    const bool ret = ImGui::Button("Start", {150.f, 0.f});
+    const bool ret = ImGui::Button(started ? "Stop" : "Start", {150.f, 0.f});
     ImGui::End();
 
     m_Archimedes.Render(plotSize, 0, SettingHeight);

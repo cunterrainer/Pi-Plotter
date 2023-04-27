@@ -35,7 +35,7 @@ public:
 	inline bool IsOpen()     const noexcept { return !glfwWindowShouldClose(m_Window);      }
 	inline void EndFrame()   const noexcept { Clear(); ImGuiRender(); PollEvents(); Swap(); }
 	inline ImVec2 Size() const noexcept { const ImGuiIO& io = ImGui::GetIO(); return { io.DisplaySize.x, io.DisplaySize.y }; }
-	bool Show() noexcept;
+	bool Show(bool started) noexcept;
 
 	inline void ResetPlots()
 	{

@@ -41,6 +41,10 @@ public:
     {
         m_Xs.clear();
         m_Ys.clear();
+        m_YMax      = std::numeric_limits<double>::lowest();
+        m_YMin      = std::numeric_limits<double>::max();
+        m_GreatestY = std::numeric_limits<double>::lowest();
+        m_LowestY   = std::numeric_limits<double>::max();
     }
 
     inline void Add(T x, T y)
