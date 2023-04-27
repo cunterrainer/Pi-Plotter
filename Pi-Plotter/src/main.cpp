@@ -54,7 +54,7 @@ int main()
     std::thread chudnovsky;
     std::thread newton;
     bool threadsActive = false;
-    std::function<void()> stopThreads = std::bind(StopThreads, std::cref(threadsActive), std::ref(archimedes), std::ref(chudnovsky), std::ref(newton));
+    const std::function<void()> stopThreads = std::bind(StopThreads, std::cref(threadsActive), std::ref(archimedes), std::ref(chudnovsky), std::ref(newton));
 
     while (window.IsOpen())
     {
