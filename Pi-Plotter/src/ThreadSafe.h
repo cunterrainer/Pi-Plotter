@@ -14,8 +14,8 @@ namespace ThreadSafe
         inline LockedWriter() noexcept = delete;
         inline LockedWriter(LockedWriter&&) noexcept = delete;
         inline LockedWriter(const LockedWriter&) noexcept = delete;
-        inline LockedWriter& operator=(const LockedWriter& other) noexcept = delete;
-        inline LockedWriter& operator=(LockedWriter&& other) noexcept = delete;
+        inline LockedWriter& operator=(LockedWriter&&) const noexcept = delete;
+        inline LockedWriter& operator=(const LockedWriter&) const noexcept = delete;
         inline ~LockedWriter() noexcept { Mutex.unlock(); }
 
         template <typename T>
@@ -44,6 +44,10 @@ namespace ThreadSafe
     private:
         std::ostream& m_Os;
     public:
+        inline Writer(Writer&&) noexcept = delete;
+        inline Writer(const Writer&) noexcept = delete;
+        inline Writer& operator=(Writer&&) const noexcept = delete;
+        inline Writer& operator=(const Writer&) const noexcept = delete;
         inline explicit Writer(std::ostream& os) noexcept : m_Os(os) {}
 
         inline LockedWriter operator<<(std::ostream& (*osmanip)(std::ostream&)) const noexcept
