@@ -1,5 +1,6 @@
 #pragma once
 #include <string>
+#include <utility>
 #include <system_error>
 
 #ifdef WINDOWS
@@ -78,6 +79,24 @@ public:
         }
         m_Os << msg;
         return *this;
+    }
+
+    template <typename... Args>
+    inline const Logger& Print(Args&&... args) const noexcept
+    {
+        return ((*this << std::forward<Args>(args)), ...);
+    }
+
+    template <typename... Args>
+    inline const Logger& Println(Args&&... args) const noexcept
+    {
+        return Print(std::forward<Args>(args)...) << Endl;
+    }
+
+    template <typename... Args>
+    inline const Logger& operator()(Args&&... args) const noexcept
+    {
+        return Print(std::forward<Args>(args)...);
     }
 };
 inline const Logger Log("[INFO] ", false, ThreadSafe::Stdout);

@@ -1,5 +1,6 @@
 #pragma once
 #include <mutex>
+#include <utility>
 #include <ostream>
 #include <iostream>
 
@@ -9,6 +10,7 @@ namespace ThreadSafe
     {
     private:
         static inline std::mutex Mutex;
+        const std::scoped_lock<std::mutex> m_Lock{Mutex};
         std::ostream& m_Os;
     public:
         inline LockedWriter() noexcept = delete;
@@ -16,12 +18,12 @@ namespace ThreadSafe
         inline LockedWriter(const LockedWriter&) noexcept = delete;
         inline LockedWriter& operator=(LockedWriter&&) const noexcept = delete;
         inline LockedWriter& operator=(const LockedWriter&) const noexcept = delete;
-        inline ~LockedWriter() noexcept { Mutex.unlock(); }
+        inline ~LockedWriter() noexcept = default;
+        inline explicit LockedWriter(std::ostream& os) noexcept : m_Os(os) {}
 
         template <typename T>
-        inline explicit LockedWriter(std::ostream& os, const T& msg) noexcept : m_Os(os) 
+        inline explicit LockedWriter(std::ostream& os, const T& msg) noexcept : LockedWriter(os)
         { 
-            Mutex.lock();
             m_Os << msg;
         }
 
@@ -37,11 +39,29 @@ namespace ThreadSafe
             return *this;
         }
 
-        template <class T>
+        template <typename T>
         inline const LockedWriter& operator<<(const T& mess) const noexcept
         {
             m_Os << mess;
             return *this;
+        }
+
+        template <typename... Args>
+        inline const LockedWriter& Print(Args&&... args) const noexcept
+        {
+            return ((*this << std::forward<Args>(args)), ...);
+        }
+
+        template <typename... Args>
+        inline const LockedWriter& Println(Args&&... args) const noexcept
+        {
+            return Print(std::forward<Args>(args)...) << '\n';
+        }
+
+        template <typename... Args>
+        inline const LockedWriter& operator()(Args&&... args) const noexcept
+        {
+            return Print(std::forward<Args>(args)...);
         }
     };
 
@@ -69,9 +89,27 @@ namespace ThreadSafe
         }
 
         template <typename T>
-        inline LockedWriter operator<<(const T& mess) const noexcept
+        inline LockedWriter operator<<(const T& msg) const noexcept
         {
-            return LockedWriter(m_Os, mess); // Has to be constructed in place of the caller from C++17 on
+            return LockedWriter(m_Os, msg); // Has to be constructed in place of the caller from C++17 on
+        }
+
+        template <typename... Args>
+        inline void Print(Args&&... args) const noexcept
+        {
+            LockedWriter(m_Os).Print(std::forward<Args>(args)...);
+        }
+
+        template <typename... Args>
+        inline void Println(Args&&... args) const noexcept
+        {
+            LockedWriter(m_Os).Println(std::forward<Args>(args)...);
+        }
+
+        template <typename... Args>
+        inline void operator()(Args&&... args) const noexcept
+        {
+            LockedWriter(m_Os).operator()(std::forward<Args>(args)...);
         }
     };
     inline const Writer Stdout(std::cout);
