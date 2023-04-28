@@ -1,22 +1,22 @@
 #pragma once
-#include <mutex>
 #include <string>
-#include <ostream>
-#include <iostream>
 #include <system_error>
-#define Endl std::endl
 
 #ifdef WINDOWS
     #include <Windows.h>
     #undef max // windows macros
     #undef min // windows macros
-    #define GetWinError() Logger::Error(GetLastError())
+    #define GetError() Logger::Error(GetLastError())
 #elif defined(LINUX)
-    #include <errno.h>
+    #include <cerrno>
     #include <unistd.h>
     #define GetError() Logger::Error(errno)
 #endif
 
+#include "ThreadSafe.h"
+#define Endl std::endl
+
+template <typename OutputStream>
 struct Logger
 {
 public:
@@ -29,8 +29,8 @@ private:
         static constexpr unsigned char OutputColorWhite = 0b0111;
         static constexpr unsigned char OutputColorLightRed = 0b1100;
     #endif
-    static inline std::mutex Mutex;
 private:
+    OutputStream& m_Os;
     const char* const m_LogInfo;
     mutable bool m_NewLine = true;
     mutable bool m_IsErr = false;
@@ -39,13 +39,10 @@ private:
     {
         #ifdef WINDOWS
             if(m_IsErr)
-            {
-                HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
-                SetConsoleTextAttribute(hConsole, OutputColorLightRed);
-            }
+                SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), OutputColorLightRed);
         #elif defined(LINUX)
             if(m_IsErr && isatty(STDOUT_FILENO))
-                std::cout << "\033[1;31m";
+                m_Os << "\033[1;31m";
         #endif
     }
 
@@ -53,40 +50,35 @@ private:
     {
         #ifdef WINDOWS
             if(m_IsErr)
-            {
-                HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
-                SetConsoleTextAttribute(hConsole, OutputColorWhite);
-            }
+                SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), OutputColorWhite);
         #elif defined(LINUX)
             if(m_IsErr && isatty(STDOUT_FILENO))
-                std::cout << "\033[0m";
+                m_Os << "\033[0m";
         #endif
     }
 public:
-    inline explicit Logger(const char* info, bool isErr) noexcept : m_LogInfo(info), m_IsErr(isErr) {}
+    inline explicit Logger(const char* info, bool isErr, OutputStream& os) noexcept : m_Os(os), m_LogInfo(info), m_IsErr(isErr) {}
 
     inline const Logger& operator<<(std::ostream& (*osmanip)(std::ostream&)) const noexcept
     {
-        std::lock_guard lock(Mutex);
-        std::cout << *osmanip;
+        m_Os << *osmanip;
         ResetOutputColor();
         m_NewLine = true;
         return *this;
     }
 
     template <class T>
-    inline const Logger& operator<<(const T& mess) const noexcept
+    inline const Logger& operator<<(const T& msg) const noexcept
     {
-        std::lock_guard lock(Mutex);
         if (m_NewLine)
         {
             SetOutputColor();
-            std::cout << m_LogInfo;
+            m_Os << m_LogInfo;
             m_NewLine = false;
         }
-        std::cout << mess;
+        m_Os << msg;
         return *this;
     }
 };
-inline const Logger Log("[INFO] ", false);
-inline const Logger Err("[ERROR] ", true);
+inline const Logger Log("[INFO] ", false, ThreadSafe::Stdout);
+inline const Logger Err("[ERROR] ", true, ThreadSafe::Stderr);
