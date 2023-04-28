@@ -4,12 +4,14 @@
 #include <ostream>
 #include <iostream>
 
+
 namespace ThreadSafe
 {
     struct LockedWriter final
     {
-    private:
+    public:
         static inline std::mutex Mutex;
+    private:
         const std::scoped_lock<std::mutex> m_Lock{Mutex};
         std::ostream& m_Os;
     public:
@@ -18,7 +20,6 @@ namespace ThreadSafe
         inline LockedWriter(const LockedWriter&) noexcept = delete;
         inline LockedWriter& operator=(LockedWriter&&) const noexcept = delete;
         inline LockedWriter& operator=(const LockedWriter&) const noexcept = delete;
-        inline ~LockedWriter() noexcept = default;
         inline explicit LockedWriter(std::ostream& os) noexcept : m_Os(os) {}
 
         template <typename T>

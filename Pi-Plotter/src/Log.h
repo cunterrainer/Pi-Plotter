@@ -1,6 +1,8 @@
 #pragma once
+#include <mutex>
 #include <string>
 #include <utility>
+#include <type_traits>
 #include <system_error>
 
 #ifdef WINDOWS
@@ -8,10 +10,12 @@
     #undef max // windows macros
     #undef min // windows macros
     #define GetError() Logger::Error(GetLastError())
+    using ColorType = WORD;
 #elif defined(LINUX)
     #include <cerrno>
     #include <unistd.h>
     #define GetError() Logger::Error(errno)
+    using ColorType = const char* const;
 #endif
 
 #include "ThreadSafe.h"
@@ -27,53 +31,48 @@ public:
     }
 private:
     #ifdef WINDOWS
-        static constexpr unsigned char OutputColorWhite = 0b0111;
-        static constexpr unsigned char OutputColorLightRed = 0b1100;
+        static constexpr ColorType OutputColorWhite = 0b0111;
+        static constexpr ColorType OutputColorLightRed = 0b1100;
+    #elif defined(LINUX)
+        static ColorType OutputColorWhite = "\033[0m";
+        static ColorType OutputColorLightRed = "\033[1;31m";
     #endif
+    static inline std::mutex Mutex;
 private:
     OutputStream& m_Os;
     const char* const m_LogInfo;
     mutable bool m_NewLine = true;
     mutable bool m_IsErr = false;
 private:
-    inline void SetOutputColor() const noexcept
+    inline const char* SetOutputColor(ColorType color) const noexcept
     {
         #ifdef WINDOWS
-            if(m_IsErr)
-                SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), OutputColorLightRed);
+            if (m_IsErr)
+                SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), color);
         #elif defined(LINUX)
-            if(m_IsErr && isatty(STDOUT_FILENO))
-                m_Os << "\033[1;31m";
+            if (m_IsErr && isatty(STDOUT_FILENO))
+                return color;
         #endif
-    }
-
-    inline void ResetOutputColor() const noexcept
-    {
-        #ifdef WINDOWS
-            if(m_IsErr)
-                SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), OutputColorWhite);
-        #elif defined(LINUX)
-            if(m_IsErr && isatty(STDOUT_FILENO))
-                m_Os << "\033[0m";
-        #endif
+        return "";
     }
 public:
     inline explicit Logger(const char* info, bool isErr, OutputStream& os) noexcept : m_Os(os), m_LogInfo(info), m_IsErr(isErr) {}
 
+    // Warning: not thread safe use Print(), Println() or operator() for thread safety
     inline const Logger& operator<<(std::ostream& (*osmanip)(std::ostream&)) const noexcept
     {
-        m_Os << *osmanip;
-        ResetOutputColor();
+        m_Os << *osmanip << SetOutputColor(OutputColorWhite);
         m_NewLine = true;
         return *this;
     }
 
+    // Warning: not thread safe use Print(), Println() or operator() for thread safety
     template <class T>
     inline const Logger& operator<<(const T& msg) const noexcept
     {
         if (m_NewLine)
         {
-            SetOutputColor();
+            m_Os << SetOutputColor(OutputColorLightRed);
             m_Os << m_LogInfo;
             m_NewLine = false;
         }
@@ -81,22 +80,35 @@ public:
         return *this;
     }
 
+    // Info: thread safe (if operator<<() is thread safe for custom types)
     template <typename... Args>
-    inline const Logger& Print(Args&&... args) const noexcept
+    inline void Print(Args&&... args) const noexcept
     {
-        return ((*this << std::forward<Args>(args)), ...);
+        if constexpr (std::is_same_v<std::remove_cv_t<std::remove_reference_t<OutputStream>>, ThreadSafe::Writer>)
+        {
+            std::scoped_lock lock{ThreadSafe::LockedWriter::Mutex};
+            m_Os.NativeStream() << SetOutputColor(OutputColorLightRed) << m_LogInfo;
+            ((m_Os.NativeStream() << std::forward<Args>(args)), ...) << SetOutputColor(OutputColorWhite);
+        }
+        else
+        {
+            m_Os << SetOutputColor(OutputColorLightRed) << m_LogInfo;
+            ((m_Os << std::forward<Args>(args)), ...) << SetOutputColor(OutputColorWhite);
+        }
     }
 
+    // Info: thread safe (if operator<<() is thread safe for custom types)
     template <typename... Args>
-    inline const Logger& Println(Args&&... args) const noexcept
+    inline void Println(Args&&... args) const noexcept
     {
-        return Print(std::forward<Args>(args)...) << Endl;
+        Print(std::forward<Args>(args)..., '\n');
     }
-
+    
+    // Info: thread safe (if operator<<() is thread safe for custom types)
     template <typename... Args>
-    inline const Logger& operator()(Args&&... args) const noexcept
+    inline void operator()(Args&&... args) const noexcept
     {
-        return Print(std::forward<Args>(args)...);
+        Print(std::forward<Args>(args)...);
     }
 };
 inline const Logger Log("[INFO] ", false, ThreadSafe::Stdout);
