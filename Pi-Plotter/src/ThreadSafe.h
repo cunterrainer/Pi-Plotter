@@ -25,6 +25,12 @@ namespace ThreadSafe
             m_Os << msg;
         }
 
+        // Modifing the stream is thread safe
+        inline std::ostream& NativeStream() const noexcept
+        {
+            return m_Os;
+        }
+
         inline const LockedWriter& operator<<(std::ostream& (*osmanip)(std::ostream&)) const noexcept
         {
             m_Os << *osmanip;
@@ -50,15 +56,22 @@ namespace ThreadSafe
         inline Writer& operator=(const Writer&) const noexcept = delete;
         inline explicit Writer(std::ostream& os) noexcept : m_Os(os) {}
 
+        // Warning: modifing the native stream is not thread safe,
+        // use 'operator<<().NativeStream()' to achieve thread safety
+        inline std::ostream& NativeStream() const noexcept
+        {
+            return m_Os;
+        }
+
         inline LockedWriter operator<<(std::ostream& (*osmanip)(std::ostream&)) const noexcept
         {
-            return LockedWriter(m_Os, osmanip);
+            return LockedWriter(m_Os, osmanip); // Has to be constructed in place of the caller from C++17 on
         }
 
         template <typename T>
         inline LockedWriter operator<<(const T& mess) const noexcept
         {
-            return LockedWriter(m_Os, mess);
+            return LockedWriter(m_Os, mess); // Has to be constructed in place of the caller from C++17 on
         }
     };
     inline const Writer Stdout(std::cout);

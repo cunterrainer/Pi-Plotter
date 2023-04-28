@@ -72,10 +72,10 @@ public:
     {
         assert(Counter > 0 && "Did you forget to call Profiler::End()?");
         const char* const profilerMsg = name[0] == 0 ? "[Profiler]" : "[Profiler] ";
-        ThreadSafe::Stdout << profilerMsg << name << " Execution time: " << Total(nanosecConversion) << ' ' << TimeAbbreviations[nanosecConversion];
-        if (Counter > 1)
-            ThreadSafe::Stdout << " [Count: " << Counter << " Average: " << Average(nanosecConversion) << ' ' << TimeAbbreviations[nanosecConversion] << ']';
-        ThreadSafe::Stdout << '\n';
+        if(Counter > 1)
+            ThreadSafe::Stdout << profilerMsg << name << " Execution time: " << Total(nanosecConversion) << ' ' << TimeAbbreviations[nanosecConversion] << " [Count: " << Counter << " Average: " << Average(nanosecConversion) << ' ' << TimeAbbreviations[nanosecConversion] << "]\n";
+        else
+            ThreadSafe::Stdout << profilerMsg << name << " Execution time: " << Total(nanosecConversion) << ' ' << TimeAbbreviations[nanosecConversion] << '\n';
         if (resetOnLog)
             Profiler::Reset();
         return true;
