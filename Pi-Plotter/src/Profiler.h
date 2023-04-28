@@ -5,6 +5,8 @@
 #include <iostream>
 #include <unordered_map>
 
+#include "ThreadSafe.h"
+
 class Profiler
 {
 public:
@@ -70,10 +72,10 @@ public:
     {
         assert(Counter > 0 && "Did you forget to call Profiler::End()?");
         const char* const profilerMsg = name[0] == 0 ? "[Profiler]" : "[Profiler] ";
-        std::cout << profilerMsg << name << " Execution time: " << Total(nanosecConversion) << ' ' << TimeAbbreviations[nanosecConversion];
+        ThreadSafe::Stdout << profilerMsg << name << " Execution time: " << Total(nanosecConversion) << ' ' << TimeAbbreviations[nanosecConversion];
         if (Counter > 1)
-            std::cout << " [Count: " << Counter << " Average: " << Average(nanosecConversion) << ' ' << TimeAbbreviations[nanosecConversion] << ']';
-        std::cout << '\n';
+            ThreadSafe::Stdout << " [Count: " << Counter << " Average: " << Average(nanosecConversion) << ' ' << TimeAbbreviations[nanosecConversion] << ']';
+        ThreadSafe::Stdout << '\n';
         if (resetOnLog)
             Profiler::Reset();
         return true;
