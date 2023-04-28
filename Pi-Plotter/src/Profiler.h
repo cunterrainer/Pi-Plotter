@@ -1,5 +1,6 @@
 ﻿#pragma once
 #include <chrono>
+#include <cassert>
 #include <cstdint>
 #include <iostream>
 #include <unordered_map>
@@ -25,18 +26,10 @@ private:
         {Conversion::Nanoseconds,  "ns"},
         {Conversion::Microseconds, "mcs"},
         {Conversion::Milliseconds, "ms"},
-        {Conversion::Seconds,      "sec"},
+        {Conversion::Seconds,      "sec(s)"},
         {Conversion::Minutes,      "min"},
         {Conversion::Hours,        "h"},
     };
-private:
-    static inline bool Log(long double nanosecConversion, const char* name, bool resetOnLog)
-    {
-        std::cout << "[Profiler] " << name << " Count: " << Count() << " Average: " << Average(nanosecConversion) << ' ' << TimeAbbreviations[nanosecConversion] << " Total: " << Total(nanosecConversion) << ' ' << TimeAbbreviations[nanosecConversion] << '\n';
-        if (resetOnLog)
-            Profiler::Reset();
-        return true;
-    }
 public:
     static inline void Start()
     {
@@ -71,6 +64,19 @@ public:
         Counter = 0;
         AccumulatedTime = std::chrono::nanoseconds::zero();
         StartTime = std::chrono::steady_clock::time_point();
+    }
+
+    static inline bool Log(long double nanosecConversion = Conversion::Nanoseconds, const char* name = "", bool resetOnLog = true)
+    {
+        assert(Counter > 0 && "Did you forget to call Profiler::End()?");
+        const char* const profilerMsg = name[0] == 0 ? "[Profiler]" : "[Profiler] ";
+        std::cout << profilerMsg << name << " Execution time: " << Total(nanosecConversion) << ' ' << TimeAbbreviations[nanosecConversion];
+        if (Counter > 1)
+            std::cout << " [Count: " << Counter << " Average: " << Average(nanosecConversion) << ' ' << TimeAbbreviations[nanosecConversion] << ']';
+        std::cout << '\n';
+        if (resetOnLog)
+            Profiler::Reset();
+        return true;
     }
 
     // Log if Count() is equal to 'value'

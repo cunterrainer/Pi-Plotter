@@ -42,8 +42,8 @@ inline void StopThreads(const bool& threadsActive, std::thread& archimedes, std:
     newton.join();
     ThreadsShouldStop = false;
     Profiler::End();
-    Log << "Successfully stoppen all threads, execution time: " << Profiler::Total(Profiler::Conversion::Seconds) << " sec(s)" << Endl;
-    Profiler::Reset();
+    Log << "Successfully stoppen all threads\n";
+    Profiler::Log(Profiler::Conversion::Seconds);
 }
 
 

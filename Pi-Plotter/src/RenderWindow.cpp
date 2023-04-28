@@ -180,17 +180,17 @@ bool RenderWindow::Show(bool started) noexcept
 {
     ImGuiStartFrame();
     const ImVec2 size = Size();
-    const ImVec2 plotSize{size.x / 3.f, size.y - SettingHeight};
+    const ImVec2 plotSize{size.x / 3.f, size.y - SettingsHeight };
 
     ImGui::SetNextWindowPos({ 0,0 });
-    ImGui::SetNextWindowSize({size.x, SettingHeight });
+    ImGui::SetNextWindowSize({size.x, SettingsHeight });
     ImGui::Begin("##Setup", nullptr, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize);
     const bool ret = ImGui::Button(started ? "Stop" : "Start", {150.f, 0.f});
     ImGui::End();
 
-    m_Archimedes.Render(plotSize, 0, SettingHeight);
-    m_Chudnovsky.Render(plotSize, plotSize.x, SettingHeight);
-    m_Newton.Render(plotSize, plotSize.x * 2.f, SettingHeight);
+    m_Archimedes.Render(plotSize, 0, SettingsHeight);
+    m_Chudnovsky.Render(plotSize, plotSize.x, SettingsHeight);
+    m_Newton.Render(plotSize, plotSize.x * 2.f, SettingsHeight);
     return ret;
 }
 

@@ -11,7 +11,7 @@
 class RenderWindow
 {
 private:
-	static inline constexpr float SettingHeight = 43.f;
+	static constexpr float SettingsHeight = 43.f;
 private:
 	GLFWwindow* m_Window = nullptr;
 	Plot<uint32_t> m_Archimedes{"Archimedes"};

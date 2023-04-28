@@ -32,6 +32,7 @@ filter { "configurations:Release" }
     symbols "off"
     optimize "Speed"
     defines "RELEASE"
+    defines "NDEBUG"
 filter {}
 
 -- only for visual studio
