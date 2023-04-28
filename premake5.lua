@@ -39,6 +39,7 @@ filter {}
 flags {
     "MultiProcessorCompile"
 }
+rtti "off"
 staticruntime "on"
 removeunreferencedcodedata "on"
 
