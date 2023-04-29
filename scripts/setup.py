@@ -1,4 +1,4 @@
-import requests, subprocess, sys, os
+import requests, subprocess, sys, os, platform
 try:
     from clint.textui import progress
 except ImportError:
@@ -6,6 +6,14 @@ except ImportError:
     subprocess.check_call([sys.executable, "-m", "pip", "install", 'clint'])
 finally:
     from clint.textui import progress
+
+def ExecutableName():
+    plt = platform.system().lower()
+    if plt == "windows":
+        return "pi-lib.exe"
+    elif plt == "linux":
+        return "pi-lib"
+    return ""
 
 def Execute(cmd):
     popen = subprocess.Popen(cmd, stdout=subprocess.PIPE, universal_newlines=True)
@@ -33,8 +41,8 @@ def main():
     f.flush()
     f.close()
     print("Finished downloading\nCompiling and creating data binaries...")
-    for i in Execute("pi-lib.exe"):
-        print("[pi-lib.exe] " + i, end='')
+    for i in Execute(ExecutableName()):
+        print(f"[{ExecutableName()}] {i}", end='')
 
 if __name__ == "__main__":
     try:

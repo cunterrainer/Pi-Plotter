@@ -60,7 +60,7 @@ static void ProgressBar(float current, float hundred)
     const size_t newBlocksToAdd = (size_t)(percentDone * PROGRESS_BAR_SIZE / 100);
     ProgressBarAdd(newBlocksToAdd);
 
-    printf("%s %.2f%% (%lld|%lld)\r", ProgressBarGet()->bar, percentDone, (size_t)current, (size_t)hundred);
+    printf("%s %.2f%% (%zu|%zu)\r", ProgressBarGet()->bar, percentDone, (size_t)current, (size_t)hundred);
     if (percentDone == 100.f)
         printf("\n");
 }

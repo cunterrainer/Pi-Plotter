@@ -34,8 +34,8 @@ private:
         static constexpr ColorType OutputColorWhite = 0b0111;
         static constexpr ColorType OutputColorLightRed = 0b1100;
     #elif defined(LINUX)
-        static ColorType OutputColorWhite = "\033[0m";
-        static ColorType OutputColorLightRed = "\033[1;31m";
+        static inline ColorType OutputColorWhite = "\033[0m";
+        static inline ColorType OutputColorLightRed = "\033[1;31m";
     #endif
     static inline std::mutex Mutex;
 private:
