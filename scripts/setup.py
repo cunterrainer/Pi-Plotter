@@ -12,7 +12,7 @@ def ExecutableName():
     if plt == "windows":
         return "pi-lib.exe"
     elif plt == "linux":
-        return "pi-lib"
+        return "./pi-lib"
     return ""
 
 def Execute(cmd):
