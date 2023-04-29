@@ -7,6 +7,7 @@
 #include <iostream>
 #include <filesystem>
 
+#include "../../Pi-Plotter/src/Log.h"
 #include "../../Pi-Plotter/src/Profiler.h"
 #include "../../Pi-Plotter/src/ProgressBar.h"
 
@@ -44,7 +45,7 @@ std::string ConvertFile(const char* file, const std::string& identifier)
     std::ifstream input(file);
     if(!input.is_open())
     {
-        std::cout << "Failed to open file [" << file << "]\n";
+        Err << "Failed to open file [" << file << ']' << Endl;
         return std::string();
     }
 
@@ -54,36 +55,36 @@ std::string ConvertFile(const char* file, const std::string& identifier)
     ss.clear();
 
     std::string content = "const char* const Pi" + identifier + "Str = \"";
-    std::cout << "Converting file [" << file << "]\n";
+    Log << "Converting file [" << file << ']' << Endl;
     content += CreateContent(data);
     return content;
 }
 
 void ExecuteCmd(const char* cmd)
 {
-    std::cout << cmd << std::endl;
-    system(cmd);
+    Log << '[' << cmd << ']' << Endl;
+    std::system(cmd);
 }
 
 // 0 = clang 1 = gcc
 void Compile(uint8_t compiler)
 {
-    std::cout << "Starting to compile: ";
+    Log << "Starting to compile: ";
     if(compiler == 0)
         ExecuteCmd("clang -O2 -c " OUTFILE_NAME " -o " BINFILE_NAME);
     else
         ExecuteCmd("gcc -O2 -c " OUTFILE_NAME " -o " BINFILE_NAME);
-    std::cout << "Finished compiling\n";
+    Log << "Finished compiling" << Endl;
 }
 
 void LinkLibrary(uint8_t compiler)
 {
-    std::cout << "Starting to create library: ";
+    Log << "Starting to create library: ";
     if(compiler == 0)
         ExecuteCmd("ar r pi-data.lib " BINFILE_NAME);
     else
         ExecuteCmd("ar r libpi-data.a " BINFILE_NAME);
-    std::cout << "Created static library\n";
+    Log << "Created static library" << Endl;
 }
 
 void CreateLibraries()
@@ -97,25 +98,25 @@ void CreateLibraries()
 void RemoveFile(const char* file)
 {
     if(std::remove(file) == 0)
-        std::cout << "Successfully removed file [" << file << "]\n";
+        Log << "Successfully removed file [" << file << ']' << Endl;
     else
-        std::cout << "Failed to remove file [" << file << "] Error: " << std::strerror(errno) << std::endl;
+        Err << "Failed to remove file [" << file << "] Error: " << std::strerror(errno) << Endl;
 }
 
 void MoveFile(const char* file, const char* newLoc)
 {
     if(std::rename(file, newLoc) == 0)
-        std::cout << "Successfully moved file [" << file << "] to [" << newLoc << "]\n";
+        Log << "Successfully moved file [" << file << "] to [" << newLoc << ']' << Endl;
     else
-        std::cout << "Failed to move file [" << file << "] to [" << newLoc << "] Error: " << std::strerror(errno) << std::endl;
+        Err << "Failed to move file [" << file << "] to [" << newLoc << "] Error: " << std::strerror(errno) << Endl;
 }
 
 void RemoveDir(const std::filesystem::path& folder)
 {
     if(std::filesystem::remove_all(folder))
-        std::cout << "Successfully removed folder [" << folder << "]\n";
+        Log << "Successfully removed folder [" << folder << ']' << Endl;
     else
-        std::cout << "Faile to removed folder [" << folder << "]\n";
+        Err << "Faile to removed folder [" << folder << ']' << Endl;
 }
 
 void CreateFolder(const std::filesystem::path& folder)
@@ -123,14 +124,14 @@ void CreateFolder(const std::filesystem::path& folder)
     if (std::filesystem::exists(folder))
         RemoveDir(folder);
     if(std::filesystem::create_directory(folder))
-        std::cout << "Successfully created folder [" << folder << "]\n";
+        Log << "Successfully created folder [" << folder << ']' << Endl;
     else
-        std::cout << "Failed to create folder [" << folder << "]\n";
+        Err << "Failed to create folder [" << folder << ']' << Endl;
 }
 
 void MoveLibraries()
 {
-    std::cout << "Moving libraries...\n";
+    Log << "Moving libraries..." << Endl;
     MoveFile(CLANG_LIB_NAME, OUT_DIR CLANG_LIB_NAME);
     MoveFile(GCC_LIB_NAME, OUT_DIR GCC_LIB_NAME);
     MoveFile(HEADER_NAME, OUT_DIR HEADER_NAME);
@@ -139,7 +140,7 @@ void MoveLibraries()
 void SetEnvironment(char** argv)
 {
     std::filesystem::path dir = std::filesystem::weakly_canonical(argv[0]).parent_path();
-    std::cout << "Changing working directory to " << dir << std::endl;
+    Log << "Changing working directory to " << dir << Endl;
     std::filesystem::current_path(dir);
 }
 
@@ -155,12 +156,12 @@ int main(int, char** argv)
     std::ofstream header(HEADER_NAME);
     header << headerContent;
     header.close();
-    std::cout << "Created header file [" << HEADER_NAME << "]\n";
+    Log << "Created header file [" << HEADER_NAME << ']' << Endl;
 
     std::ofstream output(OUTFILE_NAME);
     output << piMillionStr << "\n\n" << piBillionStr;
     output.close();
-    std::cout << "Finished writing to [" OUTFILE_NAME "]\n";
+    Log << "Finished writing to [" << OUTFILE_NAME << ']' << Endl;
 
     CreateLibraries();
     CreateFolder(OUT_DIR);
@@ -168,5 +169,5 @@ int main(int, char** argv)
     RemoveFile(OUTFILE_NAME);
     RemoveFile(BINFILE_NAME);
     Profiler::End();
-    std::cout << "\nExecution time: " << Profiler::Average(Profiler::Conversion::Seconds) << " sec(s)\n";
+    Profiler::Log(Profiler::Conversion::Seconds);
 }
