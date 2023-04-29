@@ -71,8 +71,8 @@ project "Pi-Plotter"
 
     filter { "toolset:msc* or toolset:clang*" }
         libdirs {
-            "../Dependencies/gmp/libs/clang",
-            "../Dependencies/mpfr/libs/clang"
+            "../Dependencies/gmp/libs/" .. os.host() .. "/clang",
+            "../Dependencies/mpfr/libs/" .. os.host() .. "/clang"
         }
 
     filter { "toolset:gcc* or toolset:clang*" }
@@ -116,8 +116,8 @@ project "Pi-Plotter"
         disablewarnings "cast-function-type"
         defines "GCC"
         libdirs {
-            "../Dependencies/gmp/libs/gcc",
-            "../Dependencies/mpfr/libs/gcc"
+            "../Dependencies/gmp/libs/" .. os.host() .. "/gcc",
+            "../Dependencies/mpfr/libs/" .. os.host() .. "/gcc"
         }
 
     filter "toolset:clang*"
