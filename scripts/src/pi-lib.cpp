@@ -103,7 +103,7 @@ void RemoveFile(const char* file)
         Err << "Failed to remove file [" << file << "] Error: " << std::strerror(errno) << Endl;
 }
 
-void MoveFile(const char* file, const char* newLoc)
+void MvFile(const char* file, const char* newLoc)
 {
     if(std::rename(file, newLoc) == 0)
         Log << "Successfully moved file [" << file << "] to [" << newLoc << ']' << Endl;
@@ -132,9 +132,9 @@ void CreateFolder(const std::filesystem::path& folder)
 void MoveLibraries()
 {
     Log << "Moving libraries..." << Endl;
-    MoveFile(CLANG_LIB_NAME, OUT_DIR CLANG_LIB_NAME);
-    MoveFile(GCC_LIB_NAME, OUT_DIR GCC_LIB_NAME);
-    MoveFile(HEADER_NAME, OUT_DIR HEADER_NAME);
+    MvFile(CLANG_LIB_NAME, OUT_DIR CLANG_LIB_NAME);
+    MvFile(GCC_LIB_NAME, OUT_DIR GCC_LIB_NAME);
+    MvFile(HEADER_NAME, OUT_DIR HEADER_NAME);
 }
 
 void SetEnvironment(char** argv)
