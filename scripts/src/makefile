@@ -9,9 +9,11 @@ CXXFLAGS=-D$(PLATFORM) -O2 -std=c++17
 ifeq ($(OS),Windows_NT)
 	BINFILE=$(CXXFILE:.cpp=.exe)
 	PLATFORM=WINDOWS
+	RMCMD=del /f
 else
 	BINFILE=$(CXXFILE:.cpp=)
 	PLATFORM=LINUX
+	RMCMD=rm -f
 endif
 
 
@@ -32,7 +34,7 @@ run: all
 	./$(BINFILE) $(args)
 
 clean:
-	rm -f $(LIBFILE) $(LIBHEADER)
+	$(RMCMD) $(LIBFILE) $(LIBHEADER)
 
 clean_all: clean
-	rm -f $(BINFILE)
+	$(RMCMD) $(BINFILE)
