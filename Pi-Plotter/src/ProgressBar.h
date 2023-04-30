@@ -46,7 +46,7 @@ static void ProgressBarInit()
 }
 
 
-static void ProgressBarAdd(size_t blocks)
+static void ProgressBarAdd(sizet blocks)
 {
     ProgressBarS* pBar = ProgressBarGet();
     blocks = blocks - pBar->size;
