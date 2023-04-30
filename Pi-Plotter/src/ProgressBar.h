@@ -1,9 +1,19 @@
 #ifndef PROGRESS_BAR_H
 #define PROGRESS_BAR_H
 
-#include <stdio.h>
-#include <stddef.h>
-#include <string.h>
+#ifdef __cplusplus
+    #include <cstdio>
+    #include <cstddef>
+    #include <cstring>
+    #define STD std::
+    using sizet = std::size_t;
+#else
+    #include <stdio.h>
+    #include <stddef.h>
+    #include <string.h>
+    #define STD
+    typedef size_t sizet;
+#endif
 
 #define PROGRESS_BAR_SIZE 31 // 31: msys2 default
 #define PROGRESS_BAR_REAL_SIZE (PROGRESS_BAR_SIZE + 3)
@@ -11,7 +21,7 @@
 typedef struct
 {
     char* bar;
-    size_t size;
+    sizet size;
 } ProgressBarS;
 
 
@@ -31,7 +41,7 @@ static void ProgressBarInit()
     bar[0] = '[';
     bar[PROGRESS_BAR_REAL_SIZE - 2] = ']';
     bar[PROGRESS_BAR_REAL_SIZE - 1] = '\0';
-    for (size_t i = 1; i < PROGRESS_BAR_REAL_SIZE - 2; ++i)
+    for (sizet i = 1; i < PROGRESS_BAR_REAL_SIZE - 2; ++i)
         bar[i] = '-';
 }
 
@@ -40,13 +50,13 @@ static void ProgressBarAdd(size_t blocks)
 {
     ProgressBarS* pBar = ProgressBarGet();
     blocks = blocks - pBar->size;
-    for (size_t i = 1; i < PROGRESS_BAR_SIZE + 1; ++i)
+    for (sizet i = 1; i < PROGRESS_BAR_SIZE + 1; ++i)
     {
         if (pBar->bar[i] == '-')
         {
             if (i + blocks > (PROGRESS_BAR_SIZE + 1))
                 blocks = PROGRESS_BAR_SIZE - pBar->size;
-            memset((void*)&pBar->bar[i], '#', blocks * sizeof(char));
+            STD memset((void*)&pBar->bar[i], '#', blocks * sizeof(char));
             pBar->size += blocks;
             return;
         }
@@ -57,11 +67,11 @@ static void ProgressBarAdd(size_t blocks)
 static void ProgressBar(float current, float hundred)
 {
     const float percentDone = (current / hundred) * 100.f;
-    const size_t newBlocksToAdd = (size_t)(percentDone * PROGRESS_BAR_SIZE / 100);
+    const sizet newBlocksToAdd = (sizet)(percentDone * PROGRESS_BAR_SIZE / 100);
     ProgressBarAdd(newBlocksToAdd);
 
-    printf("%s %.2f%% (%zu|%zu)\r", ProgressBarGet()->bar, percentDone, (size_t)current, (size_t)hundred);
+    STD printf("%s %.2f%% (%zu|%zu)\r", ProgressBarGet()->bar, percentDone, (sizet)current, (sizet)hundred);
     if (percentDone == 100.f)
-        printf("\n");
+        STD putchar('\n');
 }
 #endif

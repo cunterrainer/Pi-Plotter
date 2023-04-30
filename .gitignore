@@ -12,7 +12,7 @@ Makefile
 *.sln
 
 FactorialTableData
-pi-billion.txt
+pi-billion
 *.user
 *.vcxproj
 *.vcxproj.user
