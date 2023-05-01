@@ -1,5 +1,4 @@
 #pragma once
-#include <mutex>
 #include <string>
 #include <utility>
 #include <type_traits>
@@ -37,7 +36,6 @@ private:
         static inline ColorType OutputColorWhite = "\033[0m";
         static inline ColorType OutputColorLightRed = "\033[1;31m";
     #endif
-    static inline std::mutex Mutex;
 private:
     OutputStream& m_Os;
     const char* const m_LogInfo;
