@@ -107,7 +107,7 @@ public:
             m_Os.NativeStream() << SetOutputColor(OutputColorLightRed) << m_LogInfo << fmt::Format(format, std::forward<Args>(args)...) << SetOutputColor(OutputColorWhite);
         }
         else
-            m_Os << SetOutputColor(OutputColorLightRed) << m_LogInfo << fmt::Format(format, std::forward<Args>(args)...) << SetOutputColot(OutputColorWhite);
+            m_Os << SetOutputColor(OutputColorLightRed) << m_LogInfo << fmt::Format(format, std::forward<Args>(args)...) << SetOutputColor(OutputColorWhite);
     }
 
     // Info: thread safe (if operator<<() is thread safe for custom types)
@@ -120,7 +120,7 @@ public:
             m_Os.NativeStream() << SetOutputColor(OutputColorLightRed) << m_LogInfo << fmt::Format(format, std::forward<Args>(args)...) << SetOutputColor(OutputColorWhite) << '\n';
         }
         else
-            m_Os << SetOutputColor(OutputColorLightRed) << m_LogInfo << fmt::Format(format, std::forward<Args>(args)...) << SetOutputColot(OutputColorWhite) << '\n';
+            m_Os << SetOutputColor(OutputColorLightRed) << m_LogInfo << fmt::Format(format, std::forward<Args>(args)...) << SetOutputColor(OutputColorWhite) << '\n';
     }
 
     // Info: thread safe (if operator<<() is thread safe for custom types)
