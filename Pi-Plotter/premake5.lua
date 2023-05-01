@@ -96,6 +96,7 @@ project "Pi-Plotter"
             "vla",
             "shift-overflow"
         }
+        disablewarnings "format-nonliteral"
 
     filter "toolset:gcc*"
         warnings "Extra"
