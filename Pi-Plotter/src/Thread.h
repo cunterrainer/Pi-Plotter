@@ -31,7 +31,7 @@ namespace Thread
         Join(newton);
         ThreadsShouldStop = false;
         Profiler::End();
-        Log << "Successfully stoppen all threads\n";
+        Log << "Successfully stoppen all threads" << Endl;
         Profiler::Log(Profiler::Conversion::Seconds);
     }
 
