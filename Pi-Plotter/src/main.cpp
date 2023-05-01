@@ -54,9 +54,23 @@ int main()
             }
             else
             {
-                archimedes = Thread::Dispatch(Calculate<decltype(Pi::Algorithm::Archimedes), 1000000000, 100>, &window, Pi::Algorithm::Archimedes, RenderWindow::PlotID::Archimedes);
-                chudnovsky = Thread::Dispatch(Calculate<decltype(Pi::Algorithm::Chudnovsky),     100000, 100>, &window, Pi::Algorithm::Chudnovsky, RenderWindow::PlotID::Chudnovsky);
-                newton     = Thread::Dispatch(Calculate<decltype(Pi::Algorithm::Newton),             20,   1>, &window, Pi::Algorithm::Newton,     RenderWindow::PlotID::Newton);
+                switch (window.SelectedAlgorithm())
+                {
+                case RenderWindow::Archimedes:
+                    archimedes = Thread::Dispatch(Calculate<decltype(Pi::Algorithm::Archimedes), 1000000000, 100>, &window, Pi::Algorithm::Archimedes, RenderWindow::PlotID::Archimedes);
+                    break;
+                case RenderWindow::Chudnovsky:
+                    chudnovsky = Thread::Dispatch(Calculate<decltype(Pi::Algorithm::Chudnovsky), 100000, 100>, &window, Pi::Algorithm::Chudnovsky, RenderWindow::PlotID::Chudnovsky);
+                    break;
+                case RenderWindow::Newton:
+                    newton = Thread::Dispatch(Calculate<decltype(Pi::Algorithm::Newton), 20, 1>, &window, Pi::Algorithm::Newton, RenderWindow::PlotID::Newton);
+                    break;
+                default:
+                    archimedes = Thread::Dispatch(Calculate<decltype(Pi::Algorithm::Archimedes), 1000000000, 100>, &window, Pi::Algorithm::Archimedes, RenderWindow::PlotID::Archimedes);
+                    chudnovsky = Thread::Dispatch(Calculate<decltype(Pi::Algorithm::Chudnovsky), 100000, 100>, &window, Pi::Algorithm::Chudnovsky, RenderWindow::PlotID::Chudnovsky);
+                    newton     = Thread::Dispatch(Calculate<decltype(Pi::Algorithm::Newton), 20, 1>, &window, Pi::Algorithm::Newton, RenderWindow::PlotID::Newton);
+                    break;
+                }
                 if (archimedes || chudnovsky || newton)
                     threadsActive = true;
             }
