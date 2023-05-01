@@ -14,6 +14,7 @@ inline std::atomic_bool ThreadsShouldStop = false;
 template <typename Func, uint32_t Iterations, uint32_t iterMod>
 inline void Calculate(RenderWindow* window, Func func, uint8_t identifier)
 {
+    Log.Printfln("Successfully started thread (id=%u [%s])", std::this_thread::get_id(), typeid(Func).name());
     static_assert(Iterations % iterMod == 0, "Iterations & iterMod must satisfy: 'Iterations % iterMod == 0'");
     static_assert(Iterations != 0 && iterMod != 0, "Iterations & iterMod must satisfy: 'Iterations > 0 & iterMod > 0'");
     uint32_t start = 0;
@@ -27,6 +28,7 @@ inline void Calculate(RenderWindow* window, Func func, uint8_t identifier)
             window->Add(i, start, identifier);
         }
     }
+    Log.Printfln("Successfully stopped thread (id=%u [%s])", std::this_thread::get_id(), typeid(Func).name());
 }
 
 
