@@ -233,6 +233,8 @@ void RenderWindow::RenderPlot() noexcept
 bool RenderWindow::Show(bool started) noexcept
 {
     ImGuiStartFrame();
+    if (ImGui::GetIO().DisplaySize.x <= 0 || ImGui::GetIO().DisplaySize.y <= 0) return false;
+
     ImGui::SetNextWindowPos({ 0,0 });
     ImGui::SetNextWindowSize({ Size().x, SettingsHeight });
     ImGui::Begin("##Setup", nullptr, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize);
