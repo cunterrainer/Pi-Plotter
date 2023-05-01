@@ -10,19 +10,26 @@
 
 class RenderWindow
 {
+public:
+	enum PlotID { Archimedes, Chudnovsky, Newton };
 private:
 	static constexpr float SettingsHeight = 43.f;
 private:
 	GLFWwindow* m_Window = nullptr;
-	Plot<uint32_t> m_Archimedes{"Archimedes"};
-	Plot<uint32_t> m_Chudnovsky{"Chudnovsky"};
-	Plot<uint32_t> m_Newton{"Newton-Raphson"};
+	std::array<Plot<uint32_t>, 3> m_Plots =
+	{
+		Plot<uint32_t>{"Archimedes"},
+		Plot<uint32_t>{"Chudnovsky"},
+		Plot<uint32_t>{"Newton-Raphson"}
+	};
+	int m_SelectedAlgorithm = 0;
 private:
 	inline void Swap()       const noexcept { glfwSwapBuffers(m_Window);    }
 	inline void Clear()      const noexcept { glClear(GL_COLOR_BUFFER_BIT); }
 	inline void PollEvents() const noexcept { glfwPollEvents();             }
 	inline void WaitEvents() const noexcept { glfwWaitEvents();             }
 
+	void RenderPlot() noexcept;
 	bool ImGuiInit(const char* iniFileName = nullptr) const noexcept;
 	void ImGuiStartFrame() const noexcept;
 	void ImGuiRender() const noexcept;
@@ -34,27 +41,19 @@ public:
 	// loop
 	inline bool IsOpen()     const noexcept { return !glfwWindowShouldClose(m_Window);      }
 	inline void EndFrame()   const noexcept { Clear(); ImGuiRender(); PollEvents(); Swap(); }
-	inline ImVec2 Size() const noexcept { const ImGuiIO& io = ImGui::GetIO(); return { io.DisplaySize.x, io.DisplaySize.y }; }
+	inline ImVec2 Size() const noexcept     { const ImGuiIO& io = ImGui::GetIO(); return { io.DisplaySize.x, io.DisplaySize.y }; }
 	bool Show(bool started) noexcept;
 
 	inline void ResetPlots()
 	{
-		m_Archimedes.Reset();
-		m_Chudnovsky.Reset();
-		m_Newton.Reset();
+		m_Plots[PlotID::Archimedes].Reset();
+		m_Plots[PlotID::Chudnovsky].Reset();
+		m_Plots[PlotID::Newton].Reset();
 	}
 
-	inline void Add(uint32_t x, uint32_t y, uint8_t identifier)
+	inline void Add(uint32_t x, uint32_t y, PlotID identifier)
 	{
-		switch (identifier)
-		{
-		case 0:
-			m_Archimedes.Add(x, y); break;
-		case 1:
-			m_Chudnovsky.Add(x, y); break;
-		default:
-			m_Newton.Add(x, y); break;
-		}
+		m_Plots[identifier].Add(x, y);
 	}
 };
 

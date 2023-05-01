@@ -12,7 +12,7 @@
 
 inline std::atomic_bool ThreadsShouldStop = false;
 template <typename Func, uint32_t Iterations, uint32_t iterMod>
-inline void Calculate(RenderWindow* window, Func func, uint8_t identifier)
+inline void Calculate(RenderWindow* window, Func func, RenderWindow::PlotID identifier)
 {
     Log.Printfln("Successfully started thread (id=%u [%s])", std::this_thread::get_id(), typeid(Func).name());
     static_assert(Iterations % iterMod == 0, "Iterations & iterMod must satisfy: 'Iterations % iterMod == 0'");
@@ -71,9 +71,9 @@ int main()
             }
             else
             {
-                archimedes = std::thread(Calculate<decltype(Pi::Algorithm::Archimedes), 1000000000, 100>, &window, Pi::Algorithm::Archimedes, 0);
-                chudnovsky = std::thread(Calculate<decltype(Pi::Algorithm::Chudnovsky), 100000, 100>, &window, Pi::Algorithm::Chudnovsky, 1);
-                newton = std::thread(Calculate<decltype(Pi::Algorithm::Newton), 20, 1>, &window, Pi::Algorithm::Newton, 2);
+                archimedes = std::thread(Calculate<decltype(Pi::Algorithm::Archimedes), 1000000000, 100>, &window, Pi::Algorithm::Archimedes, RenderWindow::PlotID::Archimedes);
+                chudnovsky = std::thread(Calculate<decltype(Pi::Algorithm::Chudnovsky), 100000, 100>, &window, Pi::Algorithm::Chudnovsky, RenderWindow::PlotID::Chudnovsky);
+                newton = std::thread(Calculate<decltype(Pi::Algorithm::Newton), 20, 1>, &window, Pi::Algorithm::Newton, RenderWindow::PlotID::Newton);
                 threadsActive = true;
             }
         }
