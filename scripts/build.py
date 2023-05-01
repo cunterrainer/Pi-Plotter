@@ -73,11 +73,11 @@ def main():
                  ["make", "-j", "config=debug_x86"], ["make", "-j", "config=release_x86"]]
 
     if useGcc:
-        RemoveFolder(binDir)
+        RemoveFolder(binDir + "gcc/")
         if not ExecProcessList(gccProc):
             return
     if useClang:
-        RemoveFolder(binDir)
+        RemoveFolder(binDir + "clang/")
         ExecProcessList(clangProc)
 
 

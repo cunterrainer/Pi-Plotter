@@ -67,7 +67,7 @@ project "Pi-Plotter"
         externalwarnings "Off"
         disablewarnings {}
         buildoptions { "/sdl" }
-        defines "MSC"
+        defines "MSVC"
 
     filter { "toolset:msc* or toolset:clang*" }
         libdirs {
