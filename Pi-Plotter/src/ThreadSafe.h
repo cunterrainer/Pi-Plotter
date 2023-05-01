@@ -1,9 +1,28 @@
 #pragma once
 #include <mutex>
+#include <cstdio>
 #include <utility>
 #include <ostream>
 #include <iostream>
 
+namespace fmt
+{
+    template <typename... Args>
+    inline std::string Format(const char* format, Args&&... args) noexcept
+    {
+        size_t size = (size_t)std::snprintf(NULL, 0, format, std::forward<Args>(args)...) + 1; // Extra space for '\0'
+        std::string res(size, 0);
+        std::snprintf(res.data(), size, format, std::forward<Args>(args)...);
+        res.pop_back(); // '\0'
+        return res;
+    }
+
+    template <typename... Args>
+    inline std::string Format(const std::string& format, Args&&... args) noexcept
+    {
+        return Format(format.c_str(), std::forward<Args>(args)...);
+    }
+}
 
 namespace ThreadSafe
 {
@@ -54,6 +73,18 @@ namespace ThreadSafe
         }
 
         template <typename... Args>
+        inline void Printf(const char* format, Args&&... args) const
+        {
+            m_Os << fmt::Format(format, std::forward<Args>(args)...);
+        }
+
+        template <typename... Args>
+        inline void Printfln(const char* format, Args&&... args) const
+        {
+            m_Os << fmt::Format(format, std::forward<Args>(args)...) << '\n';
+        }
+
+        template <typename... Args>
         inline const LockedWriter& Println(Args&&... args) const noexcept
         {
             return Print(std::forward<Args>(args)...) << '\n';
@@ -99,6 +130,30 @@ namespace ThreadSafe
         inline void Print(Args&&... args) const noexcept
         {
             LockedWriter(m_Os).Print(std::forward<Args>(args)...);
+        }
+
+        template <typename... Args>
+        inline void Printf(const char* format, Args&&... args) const noexcept
+        {
+            LockedWriter(m_Os).Printf(format, std::forward<Args>(args)...);
+        }
+
+        template <typename... Args>
+        inline void Printfln(const char* format, Args&&... args) const
+        {
+            LockedWriter(m_Os).Printfln(format, std::forward<Args>(args)...);
+        }
+
+        template <typename... Args>
+        inline void Printf(const std::string& format, Args&&... args) const noexcept
+        {
+            LockedWriter(m_Os).Printf(format.c_str(), std::forward<Args>(args)...);
+        }
+
+        template <typename... Args>
+        inline void Printfln(const std::string& format, Args&&... args) const
+        {
+            LockedWriter(m_Os).Printfln(format.c_str(), std::forward<Args>(args)...);
         }
 
         template <typename... Args>

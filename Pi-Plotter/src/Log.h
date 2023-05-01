@@ -99,6 +99,46 @@ public:
 
     // Info: thread safe (if operator<<() is thread safe for custom types)
     template <typename... Args>
+    inline void Printf(const char* format, Args&&... args) const noexcept
+    {
+        if constexpr (std::is_same_v<std::remove_cv_t<std::remove_reference_t<OutputStream>>, ThreadSafe::Writer>)
+        {
+            std::scoped_lock lock{ ThreadSafe::LockedWriter::Mutex };
+            m_Os.NativeStream() << SetOutputColor(OutputColorLightRed) << m_LogInfo << fmt::Format(format, std::forward<Args>(args)...) << SetOutputColor(OutputColorWhite);
+        }
+        else
+            m_Os << SetOutputColor(OutputColorLightRed) << m_LogInfo << fmt::Format(format, std::forward<Args>(args)...) << SetOutputColot(OutputColorWhite);
+    }
+
+    // Info: thread safe (if operator<<() is thread safe for custom types)
+    template <typename... Args>
+    inline void Printfln(const char* format, Args&&... args) const
+    {
+        if constexpr (std::is_same_v<std::remove_cv_t<std::remove_reference_t<OutputStream>>, ThreadSafe::Writer>)
+        {
+            std::scoped_lock lock{ ThreadSafe::LockedWriter::Mutex };
+            m_Os.NativeStream() << SetOutputColor(OutputColorLightRed) << m_LogInfo << fmt::Format(format, std::forward<Args>(args)...) << SetOutputColor(OutputColorWhite) << '\n';
+        }
+        else
+            m_Os << SetOutputColor(OutputColorLightRed) << m_LogInfo << fmt::Format(format, std::forward<Args>(args)...) << SetOutputColot(OutputColorWhite) << '\n';
+    }
+
+    // Info: thread safe (if operator<<() is thread safe for custom types)
+    template <typename... Args>
+    inline void Printf(const std::string& format, Args&&... args) const noexcept
+    {
+        Printf(format.c_str(), std::forward<Args>(args)...);
+    }
+
+    // Info: thread safe (if operator<<() is thread safe for custom types)
+    template <typename... Args>
+    inline void Printfln(const std::string& format, Args&&... args) const
+    {
+        Printfln(format.c_str(), std::forward<Args>(args)...);
+    }
+
+    // Info: thread safe (if operator<<() is thread safe for custom types)
+    template <typename... Args>
     inline void Println(Args&&... args) const noexcept
     {
         Print(std::forward<Args>(args)..., '\n');
