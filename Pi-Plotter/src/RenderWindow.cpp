@@ -20,6 +20,7 @@
 #include "RenderWindow.h"
 
 
+inline bool g_ShowFPS = false;
 RenderWindow::RenderWindow(int width, int height, const char* title, GLFWmonitor* monitor, GLFWwindow* share) noexcept
 {
     glfwSetErrorCallback([](int error, const char* description){ Err << "[GLFW] " << error << ": " << description << Endl; });
@@ -44,6 +45,7 @@ RenderWindow::RenderWindow(int width, int height, const char* title, GLFWmonitor
     const GLFWvidmode* mode = glfwGetVideoMode(glfwGetPrimaryMonitor());
     glfwSetWindowPos(m_Window, (mode->width - width) / 2, (mode->height - height) / 2);
 
+    glfwSetKeyCallback(m_Window, [](GLFWwindow*, int key, int, int action, int) { if (key == GLFW_KEY_F3 && action == GLFW_RELEASE) g_ShowFPS = !g_ShowFPS; });
     glfwMakeContextCurrent(m_Window);
     glfwSwapInterval(1);
     glClearColor(0.27f, 0.27f, 0.27f, 1.0f);
@@ -239,6 +241,11 @@ bool RenderWindow::Show(bool started) noexcept
     ImGui::SameLine();
     ImGui::SetNextItemWidth(170);
     ImGui::Combo("##Algorithm", &m_SelectedAlgorithm, "Archimedes\0Chudnovsky\0Newton-Raphson\0Alle\0");
+    if (g_ShowFPS)
+    {
+        ImGui::SameLine(Size().x - 250);
+        ImGui::Text("%.3f ms/frame (%.1f FPS)", 1000.f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
+    }
     ImGui::End();
 
     RenderPlot();
