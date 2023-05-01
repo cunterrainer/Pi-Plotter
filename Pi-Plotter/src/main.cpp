@@ -1,6 +1,6 @@
 #include <thread>
-#include <atomic>
 #include <limits>
+#include <memory>
 #include <cstdint>
 #include <functional>
 
@@ -8,9 +8,9 @@
 
 #include "Pi.h"
 #include "Log.h"
+#include "Thread.h"
 #include "RenderWindow.h"
 
-inline std::atomic_bool ThreadsShouldStop = false;
 template <typename Func, uint32_t Iterations, uint32_t iterMod>
 inline void Calculate(RenderWindow* window, Func func, RenderWindow::PlotID identifier)
 {
@@ -19,7 +19,7 @@ inline void Calculate(RenderWindow* window, Func func, RenderWindow::PlotID iden
     static_assert(Iterations != 0 && iterMod != 0, "Iterations & iterMod must satisfy: 'Iterations > 0 & iterMod > 0'");
     uint32_t start = 0;
     window->Add(0, 0, identifier);
-    for (uint32_t i = 1; i <= Iterations && !ThreadsShouldStop; ++i)
+    for (uint32_t i = 1; i <= Iterations && !Thread::ThreadsShouldStop; ++i)
     {
         const auto value = func(i);
         if (i % iterMod == 0 || i == 1)
@@ -32,31 +32,14 @@ inline void Calculate(RenderWindow* window, Func func, RenderWindow::PlotID iden
 }
 
 
-inline void StopThreads(const bool& threadsActive, std::thread& archimedes, std::thread& chudnovsky, std::thread& newton)
-{
-    if (!threadsActive)
-        return;
-    Log << "Attempting to stop threads" << Endl;
-    Profiler::Start();
-    ThreadsShouldStop = true;
-    archimedes.join();
-    chudnovsky.join();
-    newton.join();
-    ThreadsShouldStop = false;
-    Profiler::End();
-    Log << "Successfully stoppen all threads\n";
-    Profiler::Log(Profiler::Conversion::Seconds);
-}
-
-
 int main()
 {
     RenderWindow window;
-    std::thread archimedes;
-    std::thread chudnovsky;
-    std::thread newton;
+    std::unique_ptr<std::thread> archimedes;
+    std::unique_ptr<std::thread> chudnovsky;
+    std::unique_ptr<std::thread> newton;
     bool threadsActive = false;
-    const std::function<void()> stopThreads = std::bind(StopThreads, std::cref(threadsActive), std::ref(archimedes), std::ref(chudnovsky), std::ref(newton));
+    const std::function<void()> stopThreads = std::bind(Thread::StopThreads, std::cref(threadsActive), std::cref(archimedes), std::cref(chudnovsky), std::cref(newton));
 
     while (window.IsOpen())
     {
@@ -71,10 +54,11 @@ int main()
             }
             else
             {
-                archimedes = std::thread(Calculate<decltype(Pi::Algorithm::Archimedes), 1000000000, 100>, &window, Pi::Algorithm::Archimedes, RenderWindow::PlotID::Archimedes);
-                chudnovsky = std::thread(Calculate<decltype(Pi::Algorithm::Chudnovsky), 100000, 100>, &window, Pi::Algorithm::Chudnovsky, RenderWindow::PlotID::Chudnovsky);
-                newton = std::thread(Calculate<decltype(Pi::Algorithm::Newton), 20, 1>, &window, Pi::Algorithm::Newton, RenderWindow::PlotID::Newton);
-                threadsActive = true;
+                archimedes = Thread::Dispatch(Calculate<decltype(Pi::Algorithm::Archimedes), 1000000000, 100>, &window, Pi::Algorithm::Archimedes, RenderWindow::PlotID::Archimedes);
+                chudnovsky = Thread::Dispatch(Calculate<decltype(Pi::Algorithm::Chudnovsky),     100000, 100>, &window, Pi::Algorithm::Chudnovsky, RenderWindow::PlotID::Chudnovsky);
+                newton     = Thread::Dispatch(Calculate<decltype(Pi::Algorithm::Newton),             20,   1>, &window, Pi::Algorithm::Newton,     RenderWindow::PlotID::Newton);
+                if (archimedes || chudnovsky || newton)
+                    threadsActive = true;
             }
         }
         window.EndFrame();
