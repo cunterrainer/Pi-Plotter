@@ -36,6 +36,7 @@ private:
     }
 public:
     inline explicit Plot(const char* name) : m_Name(name) {}
+    inline size_t Decimals() const noexcept { return m_GreatestY == std::numeric_limits<double>::lowest() ? 0 : static_cast<size_t>(m_GreatestY); }
 
     inline void Reset() noexcept
     {

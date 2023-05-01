@@ -11,10 +11,12 @@
 #include "GLFW/glfw3.h"
 #include "ImGui/imgui_impl_glfw.h"
 #include "ImGui/imgui_impl_opengl3.h"
+#include "ImGui/imgui_stdlib.h"
 #include "ImPlot/implot.h"
 
 #include "Log.h"
 #include "Arial.h"
+#include "pi-string.h"
 #include "RenderWindow.h"
 
 
@@ -176,6 +178,34 @@ void RenderWindow::ImGuiSetTheme() const noexcept
 }
 
 
+void RenderWindow::RenderText(const ImVec2& plotSize) noexcept
+{
+    ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, { 0, 0 });
+    ImGui::SetNextWindowPos({ plotSize.x, SettingsHeight });
+    ImGui::SetNextWindowSize(plotSize);
+    ImGui::Begin("##PiOutput", nullptr, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize);
+    const size_t digits = m_Plots[m_SelectedAlgorithm].Decimals();
+    std::string pi = std::string(PiBillionStr, digits+2);
+
+    size_t off = 0;
+    for (size_t i = 0; i < pi.size(); ++i)
+    {
+        if (ImGui::CalcTextSize(pi.substr(off, i-off).c_str()).x > plotSize.x)
+        {
+            pi.insert(i-1, 1, '\n');
+            off = i;
+        }
+    }
+
+    ImGui::PushStyleColor(ImGuiCol_Text, { 0.24f, 0.7f, 0.21f, 1.f }); // { 0.66f, 0.03f, 0.03f, 1.f } red
+    ImGui::TextUnformatted(fmt::Format("[%zu] 3.%s", digits, pi.substr(0, pi.size()-2).c_str()).c_str());
+    ImGui::PopStyleColor(1);
+    if (ImGui::GetScrollY() >= ImGui::GetScrollMaxY()) ImGui::SetScrollHereY(1.f);
+    ImGui::End();
+    ImGui::PopStyleVar();
+}
+
+
 void RenderWindow::RenderPlot() noexcept
 {
     const ImVec2 size = Size();
@@ -187,6 +217,7 @@ void RenderWindow::RenderPlot() noexcept
     case PlotID::Chudnovsky:
     case PlotID::Newton:
         m_Plots[m_SelectedAlgorithm].Render(plotSize, 0, SettingsHeight);
+        RenderText(plotSize);
         return;
     default:
         plotSize.x = size.x / 3.f;

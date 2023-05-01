@@ -30,6 +30,7 @@ private:
 	inline void WaitEvents() const noexcept { glfwWaitEvents();             }
 
 	void RenderPlot() noexcept;
+	void RenderText(const ImVec2& plotSize) noexcept;
 	bool ImGuiInit(const char* iniFileName = nullptr) const noexcept;
 	void ImGuiStartFrame() const noexcept;
 	void ImGuiRender() const noexcept;
