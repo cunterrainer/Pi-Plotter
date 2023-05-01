@@ -11,6 +11,10 @@
 #include "Thread.h"
 #include "RenderWindow.h"
 
+#define ARCHIMEDES_FUNC Calculate<decltype(Pi::Algorithm::Archimedes), 1000000000, 100>, &window, Pi::Algorithm::Archimedes, RenderWindow::PlotID::Archimedes
+#define CHUDNOVSKY_FUNC Calculate<decltype(Pi::Algorithm::Chudnovsky),     100000, 100>, &window, Pi::Algorithm::Chudnovsky, RenderWindow::PlotID::Chudnovsky
+#define NEWTON_FUNC     Calculate<decltype(Pi::Algorithm::Newton),             20,   1>, &window, Pi::Algorithm::Newton,     RenderWindow::PlotID::Newton
+
 template <typename Func, uint32_t Iterations, uint32_t iterMod>
 inline void Calculate(RenderWindow* window, Func func, RenderWindow::PlotID identifier)
 {
@@ -57,18 +61,18 @@ int main()
                 switch (window.SelectedAlgorithm())
                 {
                 case RenderWindow::Archimedes:
-                    archimedes = Thread::Dispatch(Calculate<decltype(Pi::Algorithm::Archimedes), 1000000000, 100>, &window, Pi::Algorithm::Archimedes, RenderWindow::PlotID::Archimedes);
+                    archimedes = Thread::Dispatch(ARCHIMEDES_FUNC);
                     break;
                 case RenderWindow::Chudnovsky:
-                    chudnovsky = Thread::Dispatch(Calculate<decltype(Pi::Algorithm::Chudnovsky), 100000, 100>, &window, Pi::Algorithm::Chudnovsky, RenderWindow::PlotID::Chudnovsky);
+                    chudnovsky = Thread::Dispatch(CHUDNOVSKY_FUNC);
                     break;
                 case RenderWindow::Newton:
-                    newton = Thread::Dispatch(Calculate<decltype(Pi::Algorithm::Newton), 20, 1>, &window, Pi::Algorithm::Newton, RenderWindow::PlotID::Newton);
+                    newton = Thread::Dispatch(NEWTON_FUNC);
                     break;
                 default:
-                    archimedes = Thread::Dispatch(Calculate<decltype(Pi::Algorithm::Archimedes), 1000000000, 100>, &window, Pi::Algorithm::Archimedes, RenderWindow::PlotID::Archimedes);
-                    chudnovsky = Thread::Dispatch(Calculate<decltype(Pi::Algorithm::Chudnovsky), 100000, 100>, &window, Pi::Algorithm::Chudnovsky, RenderWindow::PlotID::Chudnovsky);
-                    newton     = Thread::Dispatch(Calculate<decltype(Pi::Algorithm::Newton), 20, 1>, &window, Pi::Algorithm::Newton, RenderWindow::PlotID::Newton);
+                    archimedes = Thread::Dispatch(ARCHIMEDES_FUNC);
+                    chudnovsky = Thread::Dispatch(CHUDNOVSKY_FUNC);
+                    newton     = Thread::Dispatch(NEWTON_FUNC);
                     break;
                 }
                 if (archimedes || chudnovsky || newton)
