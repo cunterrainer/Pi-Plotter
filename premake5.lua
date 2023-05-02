@@ -32,14 +32,14 @@ filter { "configurations:Release" }
     optimize "Speed"
     defines "RELEASE"
     defines "NDEBUG"
+filter { "toolset:gcc* or toolset:clang*" }
+    buildoptions "-static"
+    linkoptions "-static"
 filter {}
 
--- only for visual studio
-flags {
-    "MultiProcessorCompile"
-}
+flags "MultiProcessorCompile" -- only for visual studio
 rtti "off"
-staticruntime "on"
+staticruntime "on" -- doesn't work for gcc hence the build/link-options above
 removeunreferencedcodedata "on"
 
 include "Pi-Plotter"
