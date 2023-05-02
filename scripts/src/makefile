@@ -4,7 +4,7 @@ LIBFILE=$(addprefix lib,$(GOFILE:.go=.a))
 LIBHEADER=$(LIBFILE:.a=.h)
 
 CXX=g++
-CXXFLAGS=-D$(PLATFORM) -O2 -std=c++17
+CXXFLAGS=-D$(PLATFORM) -O2 -std=c++17 -static
 
 ifeq ($(OS),Windows_NT)
 	BINFILE=$(CXXFILE:.cpp=.exe)
