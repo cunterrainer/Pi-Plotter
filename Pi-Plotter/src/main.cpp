@@ -40,6 +40,7 @@ inline void Calculate(RenderWindow* window, Func func, RenderWindow::PlotID iden
 int main(int argc, const char** argv)
 {
     if(!ApplySettings(ParseCmd(argc, argv))) return 0;
+    std::cin.get();
     RenderWindow window;
     std::unique_ptr<std::thread> archimedes;
     std::unique_ptr<std::thread> chudnovsky;

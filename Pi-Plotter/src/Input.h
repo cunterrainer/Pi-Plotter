@@ -202,7 +202,8 @@ public:
 
 		while (std::getline(ss, segment, c))
 			seglist.push_back(segment);
-		if (seglist.size() < minSize)
+
+		while(seglist.size() < minSize)
 			seglist.emplace_back("");
 		return seglist;
 	}
@@ -230,7 +231,21 @@ public:
 };
 
 
-inline void PrintHelp(const std::string& program)
+struct CmdSettings
+{
+	size_t factorial = 100000;
+	bool piBillion = true;
+	bool piMillion = false;
+	bool fromFile = false;
+	bool error = false;
+
+	size_t archimedesArgs[3] = {    100, 1000000000, 100 };
+	size_t chudnovskyArgs[3] = { 150000,     100000, 100 };
+	size_t newtonArgs[3] =     { 100000,         20,   1 };
+};
+
+
+inline void PrintHelp(const std::string& program, const CmdSettings& s)
 {
 	const auto& o = ThreadSafe::Stdout;
 	o.Printfln("Usage: %s [options]", program.c_str());
@@ -240,17 +255,30 @@ inline void PrintHelp(const std::string& program)
 	o.Println("  --billion                  | -b  Use one billion digits of pi to compare against");
 	o.Println("  --readfile                 | -r  Read pi digits from file");
 	o.Println("  --factorial=[value=100000] | -f  Set the limit for the internal factorial table");
+	o.Println("  --archimedes=[p,i,m]           | -a  Set properties for the archimedes algorithm");
+	o.Println("  --chudnovsky=[p,i,m]           | -c  Set properties for the chudnovsky algorithm");
+	o.Println("  --newton=[p,i,m]           | -n  Set properties for the newton algorithm");
+	o.Println("Properties: p = precision, i = iterations, m = render modulus, All of values must be greater than 0");
+	o.Println("Default properties:");
+	o.Printfln("--newton=%zu,%u,%u", s.newtonArgs[0], (uint32_t)s.newtonArgs[1], (uint32_t)s.newtonArgs[2]);
 }
 
 
-struct CmdSettings
+inline void SetAlgoArgs(size_t* s, const InputHandler& ih, const std::vector<std::string>& split)
 {
-	size_t factorial = 100000;
-	bool piBillion = true;
-	bool piMillion = false;
-	bool fromFile = false;
-	bool error = false;
-};
+	const std::vector<std::string> algoArgs = ih.Split(split[1], ',', 3);
+	const auto setNum = [&](size_t idx) {
+		if (ih.IsNumber<size_t>(algoArgs[idx]))
+		{
+			size_t t = ih.Number<size_t>(algoArgs[idx]);
+			if (t != 0)
+				s[idx] = t;
+		}
+	};
+	setNum(0);
+	setNum(1);
+	setNum(2);
+}
 
 
 inline CmdSettings ParseCmd(int argc, const char** argv)
@@ -268,6 +296,12 @@ inline CmdSettings ParseCmd(int argc, const char** argv)
 		{
 			s.factorial = ih.Number<size_t>(split[1]);
 		}
+		else if (split[0] == "--archimedes" || split[0] == "-a")
+			SetAlgoArgs(s.archimedesArgs, ih, split);
+		else if (split[0] == "--chudnovsky" || split[0] == "-c")
+			SetAlgoArgs(s.chudnovskyArgs, ih, split);
+		else if (split[0] == "--newton" || split[0] == "-n")
+			SetAlgoArgs(s.newtonArgs, ih, split);
 		else if (c == "--billion" || c == "-b")
 		{
 			s.piBillion = true;
@@ -282,7 +316,7 @@ inline CmdSettings ParseCmd(int argc, const char** argv)
 			s.fromFile = true;
 		else if (c == "--help" || c == "-h")
 		{
-			PrintHelp(program);
+			PrintHelp(program, CmdSettings{});
 			s.error = true;
 			return s;
 		}
@@ -347,7 +381,10 @@ inline bool ApplySettings(const CmdSettings& cs)
 		pistr = "Million";
 	}
 
-	Log.Printfln("Settings [Factorial limit=%zu] [Pi digits=%s] [Pi from file=%s]", cs.factorial, pistr, filestr);
+	ThreadSafe::Stdout.Println("-------------------------------------------------------------------------------------------");
+	Log.Printfln("Global settings [Factorial limit=%zu] [Pi digits=%s] [Pi from file=%s]", cs.factorial, pistr, filestr);
+	Log.Printfln("Algorithm settings [Archimedes=p:%zu, i:%u, m:%u] [Chudnovsky=p:%zu, i:%u, m:%u] [Newton=p:%zu, i:%u, m:%u]", cs.archimedesArgs[0], cs.archimedesArgs[1], cs.archimedesArgs[2], cs.chudnovskyArgs[0], cs.chudnovskyArgs[1], cs.chudnovskyArgs[2], cs.newtonArgs[0], cs.newtonArgs[1], cs.newtonArgs[2]);
 	FactTable.Create(cs.factorial);
+	ThreadSafe::Stdout.Println("-------------------------------------------------------------------------------------------\n");
 	return res;
 }
