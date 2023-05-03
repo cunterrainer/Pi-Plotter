@@ -199,9 +199,7 @@ void RenderWindow::RenderText(const ImVec2& plotSize) noexcept
         }
     }
 
-    ImGui::PushStyleColor(ImGuiCol_Text, { 0.24f, 0.7f, 0.21f, 1.f }); // { 0.66f, 0.03f, 0.03f, 1.f } red
     ImGui::TextUnformatted(fmt::Format("[%zu] 3.%s", digits, pi.substr(0, pi.size()-2).c_str()).c_str());
-    ImGui::PopStyleColor(1);
     if (ImGui::GetScrollY() >= ImGui::GetScrollMaxY()) ImGui::SetScrollHereY(1.f);
     ImGui::End();
     ImGui::PopStyleVar();

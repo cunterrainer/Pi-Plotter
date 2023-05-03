@@ -12,19 +12,17 @@
 #include "Thread.h"
 #include "RenderWindow.h"
 
-#define ARCHIMEDES_FUNC Calculate<decltype(Pi::Algorithm::Archimedes), 1000000000, 100>, &window, Pi::Algorithm::Archimedes, RenderWindow::PlotID::Archimedes
-#define CHUDNOVSKY_FUNC Calculate<decltype(Pi::Algorithm::Chudnovsky),     100000, 100>, &window, Pi::Algorithm::Chudnovsky, RenderWindow::PlotID::Chudnovsky
-#define NEWTON_FUNC     Calculate<decltype(Pi::Algorithm::Newton),             20,   1>, &window, Pi::Algorithm::Newton,     RenderWindow::PlotID::Newton
+#define ARCHIMEDES_FUNC(iter, mod) Calculate<decltype(Pi::Algorithm::Archimedes)>, &window, Pi::Algorithm::Archimedes, iter, mod, RenderWindow::PlotID::Archimedes
+#define CHUDNOVSKY_FUNC(iter, mod) Calculate<decltype(Pi::Algorithm::Chudnovsky)>, &window, Pi::Algorithm::Chudnovsky, iter, mod, RenderWindow::PlotID::Chudnovsky
+#define NEWTON_FUNC(iter, mod)     Calculate<decltype(Pi::Algorithm::Newton)>,     &window, Pi::Algorithm::Newton, iter, mod,     RenderWindow::PlotID::Newton
 
-template <typename Func, uint32_t Iterations, uint32_t iterMod>
-inline void Calculate(RenderWindow* window, Func func, RenderWindow::PlotID identifier)
+template <typename Func>
+inline void Calculate(RenderWindow* window, Func func, uint32_t iterations, uint32_t iterMod, RenderWindow::PlotID identifier)
 {
     Log.Printfln("Successfully started thread id=%u (%u, %s)", std::this_thread::get_id(), identifier, Utility::PlotIDString(identifier));
-    static_assert(Iterations % iterMod == 0, "Iterations & iterMod must satisfy: 'Iterations % iterMod == 0'");
-    static_assert(Iterations != 0 && iterMod != 0, "Iterations & iterMod must satisfy: 'Iterations > 0 & iterMod > 0'");
     uint32_t start = 0;
     window->Add(0, 0, identifier);
-    for (uint32_t i = 1; i <= Iterations && !Thread::ThreadsShouldStop; ++i)
+    for (uint32_t i = 1; i <= iterations && !Thread::ThreadsShouldStop; ++i)
     {
         const auto value = func(i);
         if (i % iterMod == 0 || i == 1)
@@ -39,8 +37,8 @@ inline void Calculate(RenderWindow* window, Func func, RenderWindow::PlotID iden
 
 int main(int argc, const char** argv)
 {
-    if(!ApplySettings(ParseCmd(argc, argv))) return 0;
-    std::cin.get();
+    const CmdSettings cs = ParseCmd(argc, argv);
+    if(!ApplySettings(cs)) return 0;
     RenderWindow window;
     std::unique_ptr<std::thread> archimedes;
     std::unique_ptr<std::thread> chudnovsky;
@@ -64,18 +62,18 @@ int main(int argc, const char** argv)
                 switch (window.SelectedAlgorithm())
                 {
                 case RenderWindow::Archimedes:
-                    archimedes = Thread::Dispatch(ARCHIMEDES_FUNC);
+                    archimedes = Thread::Dispatch(ARCHIMEDES_FUNC(cs.archimedesArgs[1], cs.archimedesArgs[2]));
                     break;
                 case RenderWindow::Chudnovsky:
-                    chudnovsky = Thread::Dispatch(CHUDNOVSKY_FUNC);
+                    chudnovsky = Thread::Dispatch(CHUDNOVSKY_FUNC(cs.chudnovskyArgs[1], cs.chudnovskyArgs[2]));
                     break;
                 case RenderWindow::Newton:
-                    newton = Thread::Dispatch(NEWTON_FUNC);
+                    newton = Thread::Dispatch(NEWTON_FUNC(cs.newtonArgs[1], cs.newtonArgs[2]));
                     break;
                 default:
-                    archimedes = Thread::Dispatch(ARCHIMEDES_FUNC);
-                    chudnovsky = Thread::Dispatch(CHUDNOVSKY_FUNC);
-                    newton     = Thread::Dispatch(NEWTON_FUNC);
+                    archimedes = Thread::Dispatch(ARCHIMEDES_FUNC(cs.archimedesArgs[1], cs.archimedesArgs[2]));
+                    chudnovsky = Thread::Dispatch(CHUDNOVSKY_FUNC(cs.chudnovskyArgs[1], cs.chudnovskyArgs[2]));
+                    newton     = Thread::Dispatch(NEWTON_FUNC(cs.newtonArgs[1], cs.newtonArgs[2]));
                     break;
                 }
                 if (archimedes || chudnovsky || newton)

@@ -59,6 +59,7 @@ public:
         return *this;
     }
 
+
     inline ~BigInt() noexcept
     {
         if(m_Val->_mp_d)

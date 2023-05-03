@@ -16,14 +16,13 @@
     bits is what you assign here
 */
 
-template <size_t DecimalPlaces>
+template <uint8_t>
 class BigFloat
 {
-    static_assert(DecimalPlaces != 0, "DecimalPlaces has to be greater than 0!");
-private:
-    static constexpr size_t Precision = (size_t)(3.5 * DecimalPlaces);
-    static inline const std::string s_Format = "%." + std::to_string(Precision) + "RDf";
-    static inline std::string s_Str = std::string(Precision + 2, 0);
+public:
+    static inline size_t Precision = 1;
+    static inline std::string Format = "%." + std::to_string(Precision) + "RDf";
+    static inline std::string StrBuf = std::string(Precision + 2, 0);
 private:
     mpfr_t m_Val;
 private:
@@ -45,7 +44,7 @@ private:
     template <typename Func, typename T>
     inline void Construct(const Func& func, const T& value)
     {
-        mpfr_init2(m_Val, Precision);
+        mpfr_init2(m_Val, (mpfr_prec_t)Precision);
         func(m_Val, value, ROUNDING_MODE);
     }
 public:
@@ -116,7 +115,7 @@ public:
 
     inline std::string_view Str() const
     {
-        mpfr_sprintf(s_Str.data(), s_Format.c_str(), m_Val);
-        return { &s_Str.c_str()[2], Precision };
+        mpfr_sprintf(StrBuf.data(), Format.c_str(), m_Val);
+        return { &StrBuf.c_str()[2], Precision };
     }
 };

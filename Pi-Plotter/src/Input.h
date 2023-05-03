@@ -39,11 +39,11 @@ private:
 		}
 		if constexpr (std::numeric_limits<RT<T>>::is_integer && std::numeric_limits<RT<T>>::is_signed)
 		{
-			n = std::strtoll(data, &endptr, 10);
+			n = static_cast<RT<T>>(std::strtoll(data, &endptr, 10));
 		}
 		if constexpr (std::numeric_limits<RT<T>>::is_integer && !std::numeric_limits<RT<T>>::is_signed)
 		{
-			n = std::strtoull(data, &endptr, 10);
+			n = static_cast<RT<T>>(std::strtoull(data, &endptr, 10));
 		}
 
 		if (*endptr != 0)
@@ -239,9 +239,9 @@ struct CmdSettings
 	bool fromFile = false;
 	bool error = false;
 
-	size_t archimedesArgs[3] = {    100, 1000000000, 100 };
-	size_t chudnovskyArgs[3] = { 150000,     100000, 100 };
-	size_t newtonArgs[3] =     { 100000,         20,   1 };
+	uint32_t archimedesArgs[3] = {    100, 1000000000, 100 };
+	uint32_t chudnovskyArgs[3] = { 150000,     100000, 100 };
+	uint32_t newtonArgs[3] =     { 100000,         20,   1 };
 };
 
 
@@ -255,22 +255,24 @@ inline void PrintHelp(const std::string& program, const CmdSettings& s)
 	o.Println("  --billion                  | -b  Use one billion digits of pi to compare against");
 	o.Println("  --readfile                 | -r  Read pi digits from file");
 	o.Println("  --factorial=[value=100000] | -f  Set the limit for the internal factorial table");
-	o.Println("  --archimedes=[p,i,m]           | -a  Set properties for the archimedes algorithm");
-	o.Println("  --chudnovsky=[p,i,m]           | -c  Set properties for the chudnovsky algorithm");
+	o.Println("  --archimedes=[p,i,m]       | -a  Set properties for the archimedes algorithm");
+	o.Println("  --chudnovsky=[p,i,m]       | -c  Set properties for the chudnovsky algorithm");
 	o.Println("  --newton=[p,i,m]           | -n  Set properties for the newton algorithm");
 	o.Println("Properties: p = precision, i = iterations, m = render modulus, All of values must be greater than 0");
 	o.Println("Default properties:");
-	o.Printfln("--newton=%zu,%u,%u", s.newtonArgs[0], (uint32_t)s.newtonArgs[1], (uint32_t)s.newtonArgs[2]);
+	o.Printfln("--archimedes=%u,%u,%u", s.archimedesArgs[0], s.archimedesArgs[1], s.archimedesArgs[2]);
+	o.Printfln("--chudnovsky=%u,%u,%u", s.chudnovskyArgs[0], s.chudnovskyArgs[1], s.chudnovskyArgs[2]);
+	o.Printfln("--newton=%u,%u,%u", s.newtonArgs[0], s.newtonArgs[1], s.newtonArgs[2]);
 }
 
 
-inline void SetAlgoArgs(size_t* s, const InputHandler& ih, const std::vector<std::string>& split)
+inline void SetAlgoArgs(uint32_t* s, const InputHandler& ih, const std::vector<std::string>& split)
 {
 	const std::vector<std::string> algoArgs = ih.Split(split[1], ',', 3);
 	const auto setNum = [&](size_t idx) {
-		if (ih.IsNumber<size_t>(algoArgs[idx]))
+		if (ih.IsNumber<uint32_t>(algoArgs[idx]))
 		{
-			size_t t = ih.Number<size_t>(algoArgs[idx]);
+			uint32_t t = ih.Number<uint32_t>(algoArgs[idx]);
 			if (t != 0)
 				s[idx] = t;
 		}
@@ -381,9 +383,22 @@ inline bool ApplySettings(const CmdSettings& cs)
 		pistr = "Million";
 	}
 
+	Pi::Algorithm::FloatA::Precision = (size_t)(3.5 * (double)cs.archimedesArgs[0]);
+	Pi::Algorithm::FloatA::Format = "%." + std::to_string(cs.archimedesArgs[0]) + "RDf";
+	Pi::Algorithm::FloatA::StrBuf = std::string(cs.archimedesArgs[0] + 2, 0);
+
+	Pi::Algorithm::FloatC::Precision = (size_t)(3.5 * (double)cs.chudnovskyArgs[0]);
+	Pi::Algorithm::FloatC::Format = "%." + std::to_string(cs.chudnovskyArgs[0]) + "RDf";
+	Pi::Algorithm::FloatC::StrBuf = std::string(cs.chudnovskyArgs[0] + 2, 0);
+
+	Pi::Algorithm::FloatN::Precision = (size_t)(3.5 * (double)cs.newtonArgs[0]);
+	Pi::Algorithm::FloatN::Format = "%." + std::to_string(cs.newtonArgs[0]) + "RDf";
+	Pi::Algorithm::FloatN::StrBuf = std::string(cs.newtonArgs[0] + 2, 0);
+	Pi::Algorithm::Reset();
+
 	ThreadSafe::Stdout.Println("-------------------------------------------------------------------------------------------");
-	Log.Printfln("Global settings [Factorial limit=%zu] [Pi digits=%s] [Pi from file=%s]", cs.factorial, pistr, filestr);
-	Log.Printfln("Algorithm settings [Archimedes=p:%zu, i:%u, m:%u] [Chudnovsky=p:%zu, i:%u, m:%u] [Newton=p:%zu, i:%u, m:%u]", cs.archimedesArgs[0], cs.archimedesArgs[1], cs.archimedesArgs[2], cs.chudnovskyArgs[0], cs.chudnovskyArgs[1], cs.chudnovskyArgs[2], cs.newtonArgs[0], cs.newtonArgs[1], cs.newtonArgs[2]);
+	ThreadSafe::Stdout.Printfln("Global settings [Factorial limit=%zu] [Pi digits=%s] [Pi from file=%s]", cs.factorial, pistr, filestr);
+	ThreadSafe::Stdout.Printfln("Algorithm settings [Archimedes=p:%u, i:%u, m:%u] [Chudnovsky=p:%u, i:%u, m:%u] [Newton=p:%u, i:%u, m:%u]", cs.archimedesArgs[0], cs.archimedesArgs[1], cs.archimedesArgs[2], cs.chudnovskyArgs[0], cs.chudnovskyArgs[1], cs.chudnovskyArgs[2], cs.newtonArgs[0], cs.newtonArgs[1], cs.newtonArgs[2]);
 	FactTable.Create(cs.factorial);
 	ThreadSafe::Stdout.Println("-------------------------------------------------------------------------------------------\n");
 	return res;

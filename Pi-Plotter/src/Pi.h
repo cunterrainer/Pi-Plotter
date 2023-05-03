@@ -18,9 +18,9 @@ namespace Pi
     struct Algorithm
     {
     public:
-        using FloatA = BigFloat<100>;
-        using FloatC = BigFloat<150000>;
-        using FloatN = BigFloat<100000>;
+        using FloatA = BigFloat<1>;
+        using FloatC = BigFloat<2>;
+        using FloatN = BigFloat<3>;
         static_assert(!std::disjunction_v<std::is_same<FloatA, FloatC>, std::is_same<FloatA, FloatN>, std::is_same<FloatC, FloatN>>, "FloatA & FloatC & FloatN have to be different types (different 'DecimalPlaces' parameters)");
     private:
         static inline BigInt ChudnovskyLongNumPow = 1; // -262537412640768000^0 = 1
