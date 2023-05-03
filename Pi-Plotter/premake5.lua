@@ -1,4 +1,4 @@
-project "Pi-Plotter"
+project "Pi"
     language "C++"
     cppdialect "C++17"
     defines "_CRT_SECURE_NO_WARNINGS"
