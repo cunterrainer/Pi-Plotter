@@ -4,16 +4,18 @@ LIBFILE=$(addprefix lib,$(GOFILE:.go=.a))
 LIBHEADER=$(LIBFILE:.a=.h)
 
 CXX=g++
-CXXFLAGS=-D$(PLATFORM) -O2 -std=c++17 -static
+CXXFLAGS=-D$(PLATFORM) -O2 -std=c++17 $(STATIC)
 
 ifeq ($(OS),Windows_NT)
 	BINFILE=$(CXXFILE:.cpp=.exe)
 	PLATFORM=WINDOWS
 	RMCMD=del /f
+	STATIC=-static
 else
 	BINFILE=$(CXXFILE:.cpp=)
 	PLATFORM=LINUX
 	RMCMD=rm -f
+	STATIC=
 endif
 
 
@@ -24,7 +26,7 @@ all: build_go_library build_cxx_bin
 build: all clean
 
 build_go_library:
-	go build -buildmode=c-archive -o $(LIBFILE) $(GOFILE)
+	go build -ldflags "-linkmode 'external' -extldflags '-static'" -buildmode=c-archive -o $(LIBFILE) $(GOFILE)
 
 build_cxx_bin:
 	$(CXX) $(CXXFLAGS) $(CXXFILE) $(LIBFILE) -o $(BINFILE)

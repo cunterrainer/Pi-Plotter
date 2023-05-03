@@ -32,7 +32,7 @@ filter { "configurations:Release" }
     optimize "Speed"
     defines "RELEASE"
     defines "NDEBUG"
-filter { "toolset:gcc* or toolset:clang*" }
+filter { "toolset:gcc* or toolset:clang*", "system:windows" }
     buildoptions "-static"
     linkoptions "-static"
 filter {}
