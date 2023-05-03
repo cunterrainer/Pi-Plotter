@@ -13,7 +13,7 @@
 namespace Pi
 {
     inline constexpr double PI = 3.14159265358979323846;
-    inline const std::string_view PiStr = PiBillionStr;
+    static std::string_view PiStr{};
 
     struct Algorithm
     {

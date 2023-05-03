@@ -8,6 +8,7 @@
 
 #include "Pi.h"
 #include "Log.h"
+#include "Input.h"
 #include "Thread.h"
 #include "RenderWindow.h"
 
@@ -36,15 +37,16 @@ inline void Calculate(RenderWindow* window, Func func, RenderWindow::PlotID iden
 }
 
 
-int main()
+int main(int argc, const char** argv)
 {
+    if(!ApplySettings(ParseCmd(argc, argv))) return 0;
     RenderWindow window;
     std::unique_ptr<std::thread> archimedes;
     std::unique_ptr<std::thread> chudnovsky;
     std::unique_ptr<std::thread> newton;
     bool threadsActive = false;
     const std::function<void()> stopThreads = std::bind(Thread::StopThreads, std::cref(threadsActive), std::cref(archimedes), std::cref(chudnovsky), std::cref(newton));
-
+    
     while (window.IsOpen())
     {
         if (window.Show(threadsActive))
@@ -81,7 +83,7 @@ int main()
         }
         window.EndFrame();
     }
-
+    
     stopThreads();
     mpfr_free_cache();
     return 0;

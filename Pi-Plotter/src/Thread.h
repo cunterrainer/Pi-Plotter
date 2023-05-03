@@ -58,7 +58,7 @@ namespace Thread
         {
             errorMsg = fmt::Format("Unhandled exception on thread creation (%u, %s)", identifier, algorithm);
         }
-        Log.Println(errorMsg);
+        Err.Println(errorMsg);
         MsgBoxError(errorMsg.c_str());
         return nullptr;
     }

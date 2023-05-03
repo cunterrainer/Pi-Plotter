@@ -11,27 +11,29 @@
 class FactorialTable
 {
 private:
-    std::vector<BigInt> m_Table;
-    size_t m_Limit = 100000;
-private:
+    mutable std::vector<BigInt> m_Table;
+    mutable size_t m_Limit = 0;
 public:
+    inline FactorialTable() = default;
     inline FactorialTable(const FactorialTable&) = delete;
     inline FactorialTable(FactorialTable&&) = delete;
     inline FactorialTable& operator=(const FactorialTable&) = delete;
     inline FactorialTable&& operator=(FactorialTable&&) = delete;
 
-    inline FactorialTable()
+    inline void Create(size_t limit) const
     {
-        Log << "Creating factorial table up to " << m_Limit << Endl;
+        if (limit == 0) return;
+        Log << "Creating factorial table up to " << limit << Endl;
         Profiler::Start();
         
+        m_Limit = limit;
         BigInt prev = 1;
-        m_Table.reserve(m_Limit);
+        m_Table.reserve(limit);
         ProgressBarInit();
-        for (unsigned long i = 1; i <= m_Limit; ++i)
+        for (unsigned long i = 1; i <= limit; ++i)
         {
-            if(i % 1000 == 0)
-                ProgressBar((float)i, (float)m_Limit);
+            if(i % 1000 == 0 || i == limit)
+                ProgressBar((float)i, (float)limit);
             m_Table.emplace_back(prev);
             prev *= i;
         }
